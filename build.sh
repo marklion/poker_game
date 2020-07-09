@@ -7,21 +7,24 @@ build_front_end()
 {
     echo "building front end"
     mkdir -p "$BUILD_DIR/front-end-build"
-    docker run --rm -v "${PRJ_SRC_DIR}/front-end/poker_game/":/src -v "${BUILD_DIR}/front-end-build/":/build_dir  -u 0:0 front-web-assembly-build:latest
+    docker run --rm -v "${PRJ_SRC_DIR}/front-end/poker_game/":/src -v "${BUILD_DIR}/front-end-build/":/build_dir  -u 0:0 marklion/front-web-assembly-build:v1.0
 }
 
 build_back_end()
 {
     echo "building back end"
     mkdir -p "$BUILD_DIR/back-end-build"
-    docker run --rm -v "${PRJ_SRC_DIR}/back-end/user_manage_rest_9098/user_manage":/rest_source -v "${BUILD_DIR}/back-end-build:/rest_build"  back-end-build:latest /root/build-rest.sh
-    docker run --rm -v "${PRJ_SRC_DIR}":/game_build -w /game_build/back-end/game_tcp_50050 back-end-build:latest make
+    docker run --rm -v "${PRJ_SRC_DIR}/back-end/user_manage_rest_9098/user_manage":/rest_source -v "${BUILD_DIR}/back-end-build:/rest_build"  marklion/back-end-build:v1.0 /root/build-rest.sh
+    docker run --rm -v "${PRJ_SRC_DIR}":/game_build -w /game_build/back-end/game_tcp_50050 marklion/back-end-build:v1.0 make
     mv "${PRJ_SRC_DIR}/back-end/game_tcp_50050/game" "${BUILD_DIR}/back-end-build"
 }
 
 prepare_docker()
 {
     echo "prepare docker"
+    docker pull marklion/front-web-assembly-build:v1.0
+    docker pull marklion/back-end-build:v1.0
+    docker pull marklion/poker_deploy:v1.0
 }
 main()
 {

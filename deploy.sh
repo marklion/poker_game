@@ -41,7 +41,7 @@ user_mng_deploy()
 start_server()
 {
     docker rm -f `docker ps -a | grep poker_deploy | awk '{print $1}'`
-    docker run -p 80:80 -d -v /poker_game_project/deploy/:/web  poker_deploy:latest /root/run-server.sh
+    docker run -p 80:80 -d -v /poker_game_project/deploy/:/web  marklion/poker_deploy:v1.0 /root/run-server.sh
 }
 main()
 {
