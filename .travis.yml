@@ -1,0 +1,9 @@
+services:
+  - docker
+ 
+script: 
+    - ./build.sh
+notification:
+    email:
+        on_success: always
+        on_failure: always
