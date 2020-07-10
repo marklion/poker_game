@@ -64,6 +64,7 @@ struct game_msg_card
     }
     game_msg_card() {}
     game_msg_card(bool _fake) {
+        (void)(_fake);
         number = 4;
         color = game_card_diamond;
     }
@@ -76,6 +77,7 @@ struct game_msg_enter_table {
     }
     game_msg_enter_table(){}
     game_msg_enter_table(bool _fake) {
+        (void)(_fake);
         iTableId = 2;
     }
 };
@@ -127,6 +129,7 @@ struct game_msg_table_info {
     }
     game_msg_table_info() {}
     game_msg_table_info(bool _fake) {
+        (void)(_fake);
         iTableNo = 2;
         iCurPos = 3;
         iCurBatCash = 560;
@@ -156,7 +159,9 @@ struct game_msg_hand_card_info {
 
 struct game_msg_create_table {
     game_msg_create_table() {}
-    game_msg_create_table(bool _fake) {}
+    game_msg_create_table(bool _fake) {
+        (void)(_fake);
+    }
     void convert(){}
 };
 
@@ -226,12 +231,12 @@ bool MSG_GetSSIDFromBuff(const char *pcBuff, int _iLen, char *_pcSsid);
     int iOrigLen = MSG_GetMsgLenFrombuff(buff, len);\
     int iCurLen = sizeof(type);\
     if (iOrigLen >= 0)\
-    {\
-        int iCopyLen = MSG_ENCODE_MIN(iOrigLen, iCurLen);\
-        memcpy(out, buff + GAME_MSG_SSID_LEN + sizeof(game_msg_type_em) + sizeof(int), iCopyLen);\
-        memcpy(ssid, buff, GAME_MSG_SSID_LEN);\
+{\
+    int iCopyLen = MSG_ENCODE_MIN(iOrigLen, iCurLen);\
+    memcpy(out, buff + GAME_MSG_SSID_LEN + sizeof(game_msg_type_em) + sizeof(int), iCopyLen);\
+    memcpy(ssid, buff, GAME_MSG_SSID_LEN);\
     }\
-} while(0)
+    } while(0)
 #define APPEND_MSG_TO_BUFF(ssid,msg,out,type_en,type,tmp) do {\
     memcpy(out, ssid, GAME_MSG_SSID_LEN);\
     game_msg_type_em enType = type_en;\
@@ -241,32 +246,41 @@ bool MSG_GetSSIDFromBuff(const char *pcBuff, int _iLen, char *_pcSsid);
     iLen = ntohl(iLen);\
     memcpy(out+ GAME_MSG_SSID_LEN + sizeof(game_msg_type_em), &iLen, sizeof(iLen));\
     memcpy(out+ GAME_MSG_SSID_LEN + sizeof(game_msg_type_em) + sizeof(int), msg, sizeof(type));\
-} while(0);\
-type *tmp= (type *)(out+ GAME_MSG_SSID_LEN +sizeof(game_msg_type_em) + sizeof(int))
+    } while(0);\
+    type *tmp= (type *)(out+ GAME_MSG_SSID_LEN +sizeof(game_msg_type_em) + sizeof(int))
 
 
 #define MSG_DECODE(buff, len, out, ssid) do {\
     typeof(out) *pout = &out;\
     COPY_MSG_FROM_BUFF(buff,len,typeof(out),pout,ssid);\
     pout->convert();\
-} while(0)
+    } while(0)
 
 #define MSG_ENCODE(msg,ssid,type_en,buff) do {\
     typeof(msg) *pmsg = &msg;\
     APPEND_MSG_TO_BUFF(ssid, pmsg, buff, type_en, typeof(msg),tmp);\
     tmp->convert();\
-} while(0)
+    } while(0)
 
 class Imsg_processor {
 public:
     std::string tmp;
-    virtual void proc_msg(game_msg_enter_table &_msg, char *ssid) {}
-    virtual void proc_msg(game_msg_table_info &_msg, char *ssid) {}
-    virtual void proc_msg(game_msg_hand_card_info &_msg, char *ssid) {}
-    virtual void proc_msg(game_msg_create_table &_msg, char *ssid) {}
-    virtual void proc_msg(game_msg_ready &_msg, char *ssid) {}
-    virtual void proc_msg(game_msg_action &_msg, char *ssid) {}
-    virtual void proc_msg(game_msg_last_result &_msg, char *ssid) {}
+    virtual void proc_msg(game_msg_enter_table &_msg, char *ssid) {
+        (void)(_msg);
+        (void)(ssid);
+    }
+    virtual void proc_msg(game_msg_table_info &_msg, char *ssid) {(void)(_msg);
+                                                                  (void)(ssid);}
+    virtual void proc_msg(game_msg_hand_card_info &_msg, char *ssid) {(void)(_msg);
+                                                                      (void)(ssid);}
+    virtual void proc_msg(game_msg_create_table &_msg, char *ssid) {(void)(_msg);
+                                                                    (void)(ssid);}
+    virtual void proc_msg(game_msg_ready &_msg, char *ssid) {(void)(_msg);
+                                                             (void)(ssid);}
+    virtual void proc_msg(game_msg_action &_msg, char *ssid) {(void)(_msg);
+                                                              (void)(ssid);}
+    virtual void proc_msg(game_msg_last_result &_msg, char *ssid) {(void)(_msg);
+                                                                   (void)(ssid);}
 };
 void recv_and_proccess_msg(const char *_pcBuff, int _iBuffLen, Imsg_processor *_processor);
 #endif // _MSG_ENCODE_UTILS_H_

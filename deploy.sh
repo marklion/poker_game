@@ -40,15 +40,21 @@ user_mng_deploy()
 start_server()
 {
     docker rm -f `docker ps -a | grep poker_deploy | awk '{print $1}'`
-    docker run -p 80:80 -d -v /poker_game_project/deploy/:/web  marklion/poker_deploy:v1.0 /root/run-server.sh
+    docker run -p 80:80 -d -v "$PRJ_DEPLOY_DIR":/web  marklion/poker_deploy:v1.0 /root/run-server.sh
 }
 main()
 {
-    front_end_deploy
-    resouce_deploy
-    game_deploy
-    user_mng_deploy
+    if [ -f "$1" ]
+    then
+        tar xf "$1" -C $PRJ_DEPLOY_DIR
+        cp $PRJ_DEPLOY_DIR/package*/* $PRJ_DEPLOY_DIR/ -a
+    else
+        front_end_deploy
+        resouce_deploy
+        game_deploy
+        user_mng_deploy
+    fi
     start_server
 }
 
-main
+main $@

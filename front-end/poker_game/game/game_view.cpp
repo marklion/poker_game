@@ -536,7 +536,7 @@ void game_sub_view_pub_cards::refresh()
     }
 }
 
-game_sub_view_last_result::game_sub_view_last_result(QWidget *parent)
+game_sub_view_last_result::game_sub_view_last_result(QWidget *parent):QWidget(parent)
 {
     auto result_layout = new QVBoxLayout(this);
     result_layout->addWidget(&m_pattern_type_label);

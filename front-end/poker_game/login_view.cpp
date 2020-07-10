@@ -74,6 +74,10 @@ void Login_view::random_login_btn()
 
 void Login_view::recv_data(QByteArray _data, QString _orig_uri, IprocessRestReply::orig_method _method, QByteArray _orig_req_data)
 {
+    (void)(_data);
+    (void)(_orig_uri);
+    (void)(_method);
+    (void)(_orig_req_data);
     QJsonDocument json_doc = QJsonDocument::fromJson(_data);
     auto reg_resp = json_doc.object();
     if (reg_resp.contains(REST_JSON_TYPE_KEY) && reg_resp[REST_JSON_TYPE_KEY] == REST_JSON_TYPE_RESP)
@@ -88,6 +92,10 @@ void Login_view::recv_data(QByteArray _data, QString _orig_uri, IprocessRestRepl
 
 void Login_view::meet_error(QNetworkReply::NetworkError _code, QString _orig_uri, IprocessRestReply::orig_method _method, QByteArray _orig_req_data)
 {
+    (void)(_code);
+    (void)(_orig_uri);
+    (void)(_method);
+    (void)(_orig_req_data);
 
 }
 

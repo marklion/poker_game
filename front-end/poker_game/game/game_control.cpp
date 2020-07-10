@@ -160,16 +160,19 @@ void game_control::proc_refresh_timeout()
 
 void game_control::proc_msg(game_msg_table_info &_msg, char *ssid)
 {
+    (void)(ssid);
     m_game_module.SyncTableInfo(_msg);
 }
 
 void game_control::proc_msg(game_msg_hand_card_info &_msg, char *ssid)
 {
+    (void)(ssid);
     m_game_module.UpdateMyself(_msg);
 }
 
 void game_control::proc_msg(game_msg_last_result &_msg, char *ssid)
 {
+    (void)(ssid);
     m_game_module.UpdateResult(_msg);
 }
 

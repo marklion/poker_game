@@ -72,6 +72,10 @@ void register_view::cancel_btn_click()
 
 void register_view::recv_data(QByteArray _data, QString _orig_uri, IprocessRestReply::orig_method _method, QByteArray _orig_req_data)
 {
+    (void)(_orig_uri);
+    (void)(_method);
+    (void)(_orig_req_data);
+
     QJsonDocument json_doc = QJsonDocument::fromJson(_data);
     auto reg_resp = json_doc.object();
     if (reg_resp.contains(REST_JSON_TYPE_KEY) && reg_resp[REST_JSON_TYPE_KEY] == REST_JSON_TYPE_RESP)
@@ -85,6 +89,10 @@ void register_view::recv_data(QByteArray _data, QString _orig_uri, IprocessRestR
 
 void register_view::meet_error(QNetworkReply::NetworkError _code, QString _orig_uri, IprocessRestReply::orig_method _method, QByteArray _orig_req_data)
 {
+    (void)(_code);
+    (void)(_orig_uri);
+    (void)(_method);
+    (void)(_orig_req_data);
     QMessageBox::information(this, tr("失败"), tr("注册失败"));
     return;
 }
