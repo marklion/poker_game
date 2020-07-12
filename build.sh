@@ -48,9 +48,9 @@ make_package()
     cp $BUILD_DIR/back-end-build/deploy/share/ngrest/services/* ${package_path}/rest
 
     pushd $BUILD_DIR > /dev/null
-    tar cf "${package_path}.tar" "package-$timestamp" > /dev/null
+    tar zcf "${package_path}.tar.gz" "package-$timestamp" > /dev/null
     popd > /dev/null
-    realpath "${package_path}.tar"
+    realpath "${package_path}.tar.gz"
 }
 main()
 {
