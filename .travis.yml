@@ -12,7 +12,7 @@ script:
 - "./build.sh"
 after_script:
 - chmod 600 ~/.ssh/id_rsa
-- scp -o "StrictHostKeyChecking no"`./build.sh pack` root@59.110.64.232:/root/prj-pack-repo
+- scp -o "StrictHostKeyChecking no" `./build.sh pack` root@59.110.64.232:/root/prj-pack-repo
 notifications:
   email:
     on_success: always
