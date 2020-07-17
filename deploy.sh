@@ -17,6 +17,7 @@ front_end_deploy()
     cp ${BUILD_DIR}/front-end-build/poker_game.wasm    ${PRJ_DEPLOY_DIR}
     cp ${BUILD_DIR}/front-end-build/qtloader.js ${PRJ_DEPLOY_DIR}
     cp ${BUILD_DIR}/front-end-build/qtlogo.svg ${PRJ_DEPLOY_DIR}
+    cp ${PRJ_SRC_DIR}/front-end/vue-game/index.html ${PRJ_DEPLOY_DIR}/index-test.html
 }
 resouce_deploy()
 {

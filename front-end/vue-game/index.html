@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德州扑克</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .el-row {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .el-button {
+            display: block;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <el-container>
+            <el-header>
+                <el-row :gutter="2">
+                    <el-col :span="5">
+                        <el-button type="primary" @click="random_login" v-if="status_var.has_not_login">游客登录</el-button>
+                    </el-col>
+                    <el-col :span="5">
+                        <el-button type="primary" @click="create_room">开新桌</el-button>
+                    </el-col>
+                    <el-col :span="9">
+                        <el-input v-model="bind_var.input_table_no" placeholder="请输入内容" size="large"></el-input>
+                    </el-col>
+                    <el-col :span="5">
+                        <el-button type="primary" @click="follow_room">跟随</el-button>
+                    </el-col>
+                </el-row>
+                当前桌号{{from_server.table_info.i_table_no}}
+            </el-header>
+            <el-main>
+                <el-row :gutter="10">
+                    <el-col :span="4" v-for="player in get_players_on_table()"
+                        v-if="player.seat_pos != from_server.self_info.i_self_seat">
+                        <div>{{player.seat_pos + 1}}号位</div>
+                        <div>{{player.name}}</div>
+                        <div>拥有金额{{player.cur_cash}}</div>
+                        <div>下注金额{{player.bat_cash}}</div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="10">
+                    <el-col :span="4" v-for="single_card in from_server.table_info.a_cards_on_table">
+                        {{single_card.num}}
+                        {{single_card.color}}
+                    </el-col>
+                </el-row>
+            </el-main>
+            <el-footer>
+                <el-row :gutter="10">
+                    <el-col :span="4">
+                        {{from_server.self_info.a_hand_cards[0].num}}
+                        {{from_server.self_info.a_hand_cards[0].color}}
+                    </el-col>
+                    <el-col :span="4">
+                        {{from_server.self_info.a_hand_cards[1].num}}
+                        {{from_server.self_info.a_hand_cards[1].color}}
+                    </el-col>
+                    <el-col :span="8">
+                        <div v-if="from_server.self_info.i_self_seat != -1">
+                            <el-row>{{from_server.self_info.i_self_seat + 1}}号位</el-row>
+                            <el-row>{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].name}}</el-row>
+                            <el-row>拥有金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].cur_cash}}
+                            </el-row>
+                            <el-row>下注金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].bat_cash}}
+                            </el-row>
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-slider v-model="bind_var.cur_ready_to_bat"></el-slider>
+                        <el-row :gutter="10">
+                            <el-col :span="8">
+                                <el-button type="primary" @click="bat_half_pool">半池</el-button>
+                            </el-col>
+                            <el-col :span="8">
+                                <el-button type="primary" @click="bat_full_pool">全池</el-button>
+                            </el-col>
+                            <el-col :span="8">
+                                <el-button type="primary" @click="bat_double_pool">两倍池</el-button>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-button type="primary" @click="bat_cash_out">下注{{bind_var.cur_ready_to_bat}}
+                            </el-button>
+                        </el-row>
+                        <el-row>
+                            <el-button type="primary" @click="follow_action">过牌</el-button>
+                        </el-row>
+                        <el-row>
+                            <el-button type="primary" @click="give_up_action">弃牌</el-button>
+                        </el-row>
+                    </el-col>
+                </el-row>
+            </el-footer>
+        </el-container>
+    </div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            bind_var: {
+                cur_ready_to_bat: 0,
+                input_table_no: '',
+            },
+            status_var: {
+                has_not_login: true,
+            },
+            from_server: {
+                table_info: {
+                    i_table_no: -1,
+                    i_cur_dealer_pos: -1,
+                    i_cur_bat_cash: -1,
+                    i_action_pos: -1,
+                    i_min_bat_cash: 0,
+                    a_cards_on_table: [
+                        { num: -1, color: 4 },
+                        { num: -1, color: 4 },
+                        { num: -1, color: 4 },
+                        { num: -1, color: 4 },
+                        { num: -1, color: 4 }
+                    ],
+                    a_all_players: [
+                        {
+                            name: "",
+                            cur_cash: 0,
+                            bat_cash: 0,
+                            seat_pos: -1,
+                            is_ready: false,
+                            is_falled: false,
+                            is_allin: false
+                        },
+                        {
+                            name: "",
+                            cur_cash: 0,
+                            bat_cash: 0,
+                            seat_pos: -1,
+                            is_ready: false,
+                            is_falled: false,
+                            is_allin: false
+                        },
+                        {
+                            name: "",
+                            cur_cash: 0,
+                            bat_cash: 0,
+                            seat_pos: -1,
+                            is_ready: false,
+                            is_falled: false,
+                            is_allin: false
+                        },
+                        {
+                            name: "",
+                            cur_cash: 0,
+                            bat_cash: 0,
+                            seat_pos: -1,
+                            is_ready: false,
+                            is_falled: false,
+                            is_allin: false
+                        },
+                        {
+                            name: "",
+                            cur_cash: 0,
+                            bat_cash: 0,
+                            seat_pos: -1,
+                            is_ready: false,
+                            is_falled: false,
+                            is_allin: false
+                        },
+                        {
+                            name: "",
+                            cur_cash: 0,
+                            bat_cash: 0,
+                            seat_pos: -1,
+                            is_ready: false,
+                            is_falled: false,
+                            is_allin: false
+                        },
+                    ],
+                    b_game_start: false,
+                },
+                self_info: {
+                    i_self_seat: -1,
+                    a_hand_cards: [
+                        { num: -1, color: 4 },
+                        { num: -1, color: 4 },
+                    ]
+                },
+                last_result: {
+                    a_all_result: [
+                        {
+                            b_show: false,
+                            en_patten_type: 9,
+                            a_final_pattern: [
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                            ]
+                        },
+                        {
+                            b_show: false,
+                            en_patten_type: 9,
+                            a_final_pattern: [
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                            ]
+                        },
+                        {
+                            b_show: false,
+                            en_patten_type: 9,
+                            a_final_pattern: [
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                            ]
+                        },
+                        {
+                            b_show: false,
+                            en_patten_type: 9,
+                            a_final_pattern: [
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                            ]
+                        },
+                        {
+                            b_show: false,
+                            en_patten_type: 9,
+                            a_final_pattern: [
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                            ]
+                        },
+                        {
+                            b_show: false,
+                            en_patten_type: 9,
+                            a_final_pattern: [
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                                { num: -1, color: 4 },
+                            ]
+                        },
+                    ]
+                }
+            },
+            get_players_on_table: function() {
+                var ret = [];
+                if (this.from_server.self_info.i_self_seat != -1)
+                {
+                    var index = this.from_server.self_info.i_self_seat + 1;
+                    index %= 6;
+                    while (index != this.from_server.self_info.i_self_seat)
+                    {
+                        this.from_server.table_info.a_all_players.forEach(element => {
+                            if (element.seat_pos == index) {
+                                ret.push(element);
+                            }
+                        });
+                        index += 1;
+                        index %= 6;
+                    }
+                }
+                return ret;
+            },
+        },
+        methods: {
+            random_login: function (event) {
+                vue_this = this;
+                axios.get('http://59.110.64.232/user_manage/login_random').then(function (resp) {
+                    vue_this.ssid = resp.data.result.ssid;
+                    vue_this.ws_socket = new WebSocket("ws://59.110.64.232/game", "binary");
+                    vue_this.ws_socket.binaryType = "arraybuffer";
+                    vue_this.ws_socket.onopen = function (evt) {
+                        vue_this.has_not_login = false;
+                    };
+                    vue_this.ws_socket.onmessage = function (event) {
+                        console.log(event);
+                        var total_length = event.data.byteLength;
+                        var left_length = total_length;
+                        while (left_length > 0) {
+                            var from_server_data = event.data.slice(total_length - left_length, total_length);
+                            var cur_length = new DataView(from_server_data, 36).getUint32(0);
+                            left_length -= cur_length + 40;
+                            var cur_type = new DataView(from_server_data, 32).getUint32(0);
+                            switch (cur_type) {
+                                case 2:
+                                    var table_info_msg = new DataView(from_server_data, 32 + 8);
+                                    vue_this.from_server.table_info.i_table_no = table_info_msg.getInt32(0);
+                                    vue_this.from_server.table_info.i_cur_dealer_pos = table_info_msg.getInt32(4);
+                                    vue_this.from_server.table_info.i_cur_bat_cash = table_info_msg.getInt32(8);
+                                    vue_this.from_server.table_info.i_action_pos = table_info_msg.getInt32(12);
+                                    vue_this.from_server.table_info.i_min_bat_cash = table_info_msg.getInt32(16);
+                                    vue_this.from_server.table_info.a_cards_on_table.forEach((element, index) => {
+                                        element.color = table_info_msg.getInt32(20 + index * 8);
+                                        element.num = table_info_msg.getInt32(24 + index * 8);
+                                    });
+                                    vue_this.from_server.table_info.a_all_players.forEach((element, index) => {
+                                        var name_string = new Uint8Array(table_info_msg.buffer, 60 + index * 56 + table_info_msg.byteOffset, 32);
+                                        element.name = new TextDecoder().decode(name_string.slice(0,name_string.indexOf(0)));
+                                        element.cur_cash = table_info_msg.getInt32(92 + index * 56);
+                                        element.bat_cash = table_info_msg.getInt32(96 + index * 56);
+                                        element.seat_pos = table_info_msg.getInt32(100 + index * 56);
+                                        element.is_ready = table_info_msg.getInt32(104 + index * 56);
+                                        element.is_falled = table_info_msg.getInt32(108 + index * 56);
+                                        element.is_allin = table_info_msg.getInt32(112 + index * 56);
+                                    });
+                                    vue_this.from_server.table_info.b_game_start = table_info_msg.getInt32(396);
+                                    break;
+                                case 3:
+                                    var self_info_msg = new DataView(from_server_data, 32 + 8);
+                                    vue_this.from_server.self_info.i_self_seat = self_info_msg.getInt32(0);
+                                    vue_this.from_server.self_info.a_hand_cards.forEach((element, index) => {
+                                        element.color = self_info_msg.getInt32(4 +  index * 8);
+                                        element.num = self_info_msg.getInt32(8 + index * 8);
+                                    });
+                                    break;
+                                case 8:
+
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }
+                        console.log(vue_this);
+                    };
+                }).catch(function (err) {
+                    console.log(err);
+                });
+            },
+            create_room: function (event) {
+                var msg = new ArrayBuffer(40);
+                var ssid_buff = new Uint8Array(msg);
+                for (let index = 0; index < this.ssid.length; index++) {
+                    ssid_buff[index] = this.ssid.charCodeAt(index);
+                }
+                new DataView(msg, 32).setUint32(0, 4);
+                new DataView(msg, 36).setUint32(0, 0);
+
+                this.ws_socket.send(msg);
+
+            },
+            follow_room: function (event) {
+                console.log(this.input_table_no);
+                // var msg = new ArrayBuffer(40);
+                // var ssid_buff = new Uint8Array(msg);
+                // for (let index = 0; index < this.ssid.length; index++) {
+                //     ssid_buff[index] = this.ssid.charCodeAt(index);
+                // }
+                // new DataView(msg, 32).setUint32(0, 4);
+                // new DataView(msg, 36).setUint32(0, 0);
+
+                // this.ws_socket.send(msg);
+
+            },
+
+        }
+    });
+
+</script>
+
+</html>
