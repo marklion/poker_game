@@ -21,25 +21,30 @@
 
 <body>
     <div id="app">
-        <el-container>
+        <el-button type="primary" @click="random_login" v-if="status_var.has_not_login">游客登录</el-button>
+        <el-container v-if="!status_var.has_not_login">
             <el-header>
-                <el-row :gutter="2">
-                    <el-col :span="5">
-                        <el-button type="primary" @click="random_login" v-if="status_var.has_not_login">游客登录</el-button>
-                    </el-col>
-                    <el-col :span="5">
+                <el-row :gutter="2" v-if="from_server.table_info.i_table_no == -1">
+                    <el-col :span="4">
                         <el-button type="primary" @click="create_room">开新桌</el-button>
                     </el-col>
-                    <el-col :span="9">
-                        <el-input v-model="bind_var.input_table_no" placeholder="请输入内容" size="large"></el-input>
+                    <el-col :span="16">
+                        <el-input v-model="bind_var.input_table_no" placeholder="请输入房间号" size="large"></el-input>
                     </el-col>
-                    <el-col :span="5">
+                    <el-col :span="4">
                         <el-button type="primary" @click="follow_room">跟随</el-button>
                     </el-col>
                 </el-row>
-                当前桌号{{from_server.table_info.i_table_no}}
+                <el-row v-if="from_server.table_info.i_table_no != -1">
+                    <el-col :span="20">
+                        <h1 >{{from_server.table_info.i_table_no}}号桌</h1>
+                    </el-col>
+                    <el-col :span="4">
+                        <el-button type="primary" @click="disconnect_from_server">离开</el-button>
+                    </el-col>
+                </el-row>
             </el-header>
-            <el-main>
+            <el-main v-if="from_server.table_info.i_table_no != -1">
                 <el-row :gutter="10">
                     <el-col :span="4" v-for="player in get_players_on_table()"
                         v-if="player.seat_pos != from_server.self_info.i_self_seat">
@@ -51,33 +56,42 @@
                 </el-row>
                 <el-row :gutter="10">
                     <el-col :span="4" v-for="single_card in from_server.table_info.a_cards_on_table">
-                        {{single_card.num}}
-                        {{single_card.color}}
+                        <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
                     </el-col>
                 </el-row>
             </el-main>
-            <el-footer>
+            <el-footer v-if="from_server.table_info.i_table_no != -1">
                 <el-row :gutter="10">
-                    <el-col :span="4">
-                        {{from_server.self_info.a_hand_cards[0].num}}
-                        {{from_server.self_info.a_hand_cards[0].color}}
-                    </el-col>
-                    <el-col :span="4">
-                        {{from_server.self_info.a_hand_cards[1].num}}
-                        {{from_server.self_info.a_hand_cards[1].color}}
+                    <el-col :span="8">
+                        <el-col :span="12">
+                            <el-image
+                                :src="get_card_pic_url(from_server.self_info.a_hand_cards[0].color, from_server.self_info.a_hand_cards[0].num)">
+                            </el-image>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-image
+                                :src="get_card_pic_url(from_server.self_info.a_hand_cards[1].color, from_server.self_info.a_hand_cards[1].num)">
+                            </el-image>
+                        </el-col>
+                        <el-row v-if="!from_server.table_info.b_game_start">
+                            <el-button type="primary" @click="get_ready">{{ready_button()}}</el-button>
+                        </el-row>
                     </el-col>
                     <el-col :span="8">
                         <div v-if="from_server.self_info.i_self_seat != -1">
                             <el-row>{{from_server.self_info.i_self_seat + 1}}号位</el-row>
-                            <el-row>{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].name}}</el-row>
-                            <el-row>拥有金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].cur_cash}}
+                            <el-row>{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].name}}
                             </el-row>
-                            <el-row>下注金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].bat_cash}}
+                            <el-row>
+                                拥有金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].cur_cash}}
+                            </el-row>
+                            <el-row>
+                                下注金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].bat_cash}}
                             </el-row>
                         </div>
                     </el-col>
                     <el-col :span="8">
-                        <el-slider v-model="bind_var.cur_ready_to_bat"></el-slider>
+                        <el-slider :min="get_min_bat_cash()" :max="get_max_bat_cash()" v-model="bind_var.cur_ready_to_bat"></el-slider>
                         <el-row :gutter="10">
                             <el-col :span="8">
                                 <el-button type="primary" @click="bat_half_pool">半池</el-button>
@@ -120,6 +134,43 @@
             },
             status_var: {
                 has_not_login: true,
+            },
+            get_min_bat_cash: function() {
+                return this.from_server.table_info.i_min_bat_cash * 2;
+            },
+            get_max_bat_cash: function() {
+                var self_player = this.get_self_player_info();
+                var my_self_cash = self_player.bat_cash + self_player.cur_cash;
+
+                return my_self_cash;
+            },
+            get_self_player_info: function() {
+                for (const index in this.from_server.table_info.a_all_players) {
+                    var ret = this.from_server.table_info.a_all_players[index];
+                    if (ret.seat_pos == this.from_server.self_info.i_self_seat)
+                    {
+                        return ret;
+                    }
+                }
+            },
+            ready_button: function() {
+                if (this.get_self_ready())
+                {
+                    return "取消准备";
+                }
+                else
+                {
+                    return "准备";
+                }
+            },
+            get_card_pic_url: function (color, number) {
+                var color_map = ["heart", "spade", "diamond", "club"];
+                if (number == 0 || color == 4) {
+                    return "http://59.110.64.232/resource/cards_imgs/little_joker.jpg"
+                }
+                else {
+                    return "http://59.110.64.232/resource/cards_imgs/" + color_map[color] + "_" + number + ".jpg";
+                }
             },
             from_server: {
                 table_info: {
@@ -271,14 +322,12 @@
                     ]
                 }
             },
-            get_players_on_table: function() {
+            get_players_on_table: function () {
                 var ret = [];
-                if (this.from_server.self_info.i_self_seat != -1)
-                {
+                if (this.from_server.self_info.i_self_seat != -1) {
                     var index = this.from_server.self_info.i_self_seat + 1;
                     index %= 6;
-                    while (index != this.from_server.self_info.i_self_seat)
-                    {
+                    while (index != this.from_server.self_info.i_self_seat) {
                         this.from_server.table_info.a_all_players.forEach(element => {
                             if (element.seat_pos == index) {
                                 ret.push(element);
@@ -299,7 +348,7 @@
                     vue_this.ws_socket = new WebSocket("ws://59.110.64.232/game", "binary");
                     vue_this.ws_socket.binaryType = "arraybuffer";
                     vue_this.ws_socket.onopen = function (evt) {
-                        vue_this.has_not_login = false;
+                        vue_this.status_var.has_not_login = false;
                     };
                     vue_this.ws_socket.onmessage = function (event) {
                         console.log(event);
@@ -324,7 +373,7 @@
                                     });
                                     vue_this.from_server.table_info.a_all_players.forEach((element, index) => {
                                         var name_string = new Uint8Array(table_info_msg.buffer, 60 + index * 56 + table_info_msg.byteOffset, 32);
-                                        element.name = new TextDecoder().decode(name_string.slice(0,name_string.indexOf(0)));
+                                        element.name = new TextDecoder().decode(name_string.slice(0, name_string.indexOf(0)));
                                         element.cur_cash = table_info_msg.getInt32(92 + index * 56);
                                         element.bat_cash = table_info_msg.getInt32(96 + index * 56);
                                         element.seat_pos = table_info_msg.getInt32(100 + index * 56);
@@ -338,7 +387,7 @@
                                     var self_info_msg = new DataView(from_server_data, 32 + 8);
                                     vue_this.from_server.self_info.i_self_seat = self_info_msg.getInt32(0);
                                     vue_this.from_server.self_info.a_hand_cards.forEach((element, index) => {
-                                        element.color = self_info_msg.getInt32(4 +  index * 8);
+                                        element.color = self_info_msg.getInt32(4 + index * 8);
                                         element.num = self_info_msg.getInt32(8 + index * 8);
                                     });
                                     break;
@@ -369,18 +418,93 @@
 
             },
             follow_room: function (event) {
-                console.log(this.input_table_no);
-                // var msg = new ArrayBuffer(40);
-                // var ssid_buff = new Uint8Array(msg);
-                // for (let index = 0; index < this.ssid.length; index++) {
-                //     ssid_buff[index] = this.ssid.charCodeAt(index);
-                // }
-                // new DataView(msg, 32).setUint32(0, 4);
-                // new DataView(msg, 36).setUint32(0, 0);
+                console.log(this.bind_var.input_table_no);
+                var msg = new ArrayBuffer(44);
+                var ssid_buff = new Uint8Array(msg);
+                for (let index = 0; index < this.ssid.length; index++) {
+                    ssid_buff[index] = this.ssid.charCodeAt(index);
+                }
+                new DataView(msg, 32).setUint32(0, 1);
+                new DataView(msg, 36).setUint32(0, 4);
+                console.log(this.get_self_ready());
+                new DataView(msg, 40).setInt32(0, Number(this.bind_var.input_table_no));
+                this.ws_socket.send(msg);
+            },
+            get_self_ready: function() {
+                for (const element in this.from_server.table_info.a_all_players) {
+                    if (this.from_server.table_info.a_all_players[element].seat_pos == this.from_server.self_info.i_self_seat)
+                    {
+                        if (this.from_server.table_info.a_all_players[element].is_ready)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            },
 
-                // this.ws_socket.send(msg);
+            get_ready: function() {
+                var msg = new ArrayBuffer(44);
+                var ssid_buff = new Uint8Array(msg);
+                for (let index = 0; index < this.ssid.length; index++) {
+                    ssid_buff[index] = this.ssid.charCodeAt(index);
+                }
+                new DataView(msg, 32).setUint32(0, 6);
+                new DataView(msg, 36).setUint32(0, 4);
+                console.log(this.get_self_ready());
+                if (this.get_self_ready()) {
+                    new DataView(msg, 40).setUint32(0, 0);
+                }
+                else {
+                    new DataView(msg, 40).setUint32(0, 1);
+                }
+                this.ws_socket.send(msg);
+            },
+
+            disconnect_from_server: function() {
+                this.ws_socket.close();
+                location.reload(true);
+            },
+            bat_half_pool: function() {
+                var tmp_cash = this.from_server.table_info.i_cur_bat_cash / 2;
+                this.bat_some_cash_ready(tmp_cash);
+            },
+            bat_full_pool: function() {
+                var tmp_cash = this.from_server.table_info.i_cur_bat_cash;
+                this.bat_some_cash_ready(tmp_cash);
+            },
+            bat_double_pool: function() {
+                var tmp_cash = this.from_server.table_info.i_cur_bat_cash * 2;
+                this.bat_some_cash_ready(tmp_cash);
+            },
+            bat_some_cash_ready: function(tmp_cash) {
+                if (tmp_cash < this.get_min_bat_cash()) {
+                    this.bind_var.cur_ready_to_bat = this.get_min_bat_cash();
+                }
+                else if (tmp_cash > this.get_max_bat_cash())
+                {
+                    this.bind_var.cur_ready_to_bat = this.get_max_bat_cash();
+                }
+                else
+                {
+                    this.bind_var.cur_ready_to_bat = tmp_cash;
+                }
 
             },
+            bat_cash_out: function() {
+
+            },
+            send_bat_req: function(_action, _bat_cash) {
+                var msg = new ArrayBuffer(48);
+                var ssid_buff = new Uint8Array(msg);
+                for (let index = 0; index < this.ssid.length; index++) {
+                    ssid_buff[index] = this.ssid.charCodeAt(index);
+                }
+                new DataView(msg, 32).setUint32(0, 7);
+                new DataView(msg, 36).setUint32(0, 8);
+                new DataView(msg, 40).setUint32(0, _action);
+                new DataView(msg, 44).setUint32(0, _bat_cash);
+            }
 
         }
     });
