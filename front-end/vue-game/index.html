@@ -15,13 +15,28 @@
         .el-button {
             display: block;
             width: 100%;
+            padding-left: 4px;
+            padding-right: 4px;
         }
 
         .each_player_show {
-            background-color: antiquewhite;
             font-size: small;
             padding: 1px;
             text-align: center;
+            background-size: auto 100%;
+            background-repeat: no-repeat;
+            color: darkgreen;
+            line-height: 600%;
+        }
+
+        .self_show {
+            font-size: small;
+            padding: 1px;
+            text-align: center;
+            background-size: auto 100%;
+            background-repeat: no-repeat;
+            color: darkgreen;
+            line-height: 100%;
         }
     </style>
 </head>
@@ -54,31 +69,15 @@
             <el-main v-if="from_server.table_info.i_table_no != -1">
                 <el-row :gutter="12">
                     <el-col :span="8">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6)">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px'}"
+                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6)"
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 4) % 6 + 1)">
                             <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).seat_pos + 1}}号位
+                                {{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).name}}
                             </div>
                             <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).name}}
-                            </div>
-                            <div>
-                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).cur_cash}}</i>
-                            </div>
-                        </el-card>
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
-                            无玩家
-                        </el-card>
-                    </el-col>
-                    <el-col :span="8">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6)">
-                            <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).seat_pos + 1}}号位
-                            </div>
-                            <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).name}}
-                            </div>
-                            <div>
-                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).cur_cash}}</i>
+                                <i
+                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).cur_cash}}</i>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -86,15 +85,31 @@
                         </el-card>
                     </el-col>
                     <el-col :span="8">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6)">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }"
+                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6)"
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 3) % 6 + 1)">
                             <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).seat_pos + 1}}号位
+                                {{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).name}}
                             </div>
                             <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).name}}
+                                <i
+                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).cur_cash}}</i>
+                            </div>
+                        </el-card>
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
+                            无玩家
+                        </el-card>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }"
+                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6)"
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 2) % 6 + 1)">
+                            <div>
+                                {{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).name}}
                             </div>
                             <div>
-                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).cur_cash}}</i>
+                                <i
+                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).cur_cash}}</i>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -102,48 +117,48 @@
                         </el-card>
                     </el-col>
                 </el-row>
-                <el-row :gutter="12">
-                    <el-col :span="4">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6)">
+                <el-row :gutter="5">
+                    <el-col :span="6">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }"
+                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6)"
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 5) % 6 + 1)">
                             <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).seat_pos + 1}}号位
+                                {{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).name}}
                             </div>
                             <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).name}}
-                            </div>
-                            <div>
-                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).cur_cash}}</i>
+                                <i
+                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).cur_cash}}</i>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
                             无玩家
                         </el-card>
                     </el-col>
-                    <el-col :span="16">
+                    <el-col :span="12">
                         <el-row :gutter="5">
-                            <el-col :span="15">
-                                <el-col :span="8" v-for="single_card in from_server.table_info.a_cards_on_table.slice(0,3)">
-                                    <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
-                                </el-col>
-                            </el-col>
-                            <el-col :span="9">
-                                <el-col :span="12" v-for="single_card in from_server.table_info.a_cards_on_table.slice(3,5)">
-                                    <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
-                                </el-col>
+                            <el-col :span="8" v-for="single_card in from_server.table_info.a_cards_on_table.slice(0,3)">
+                                <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
                             </el-col>
                         </el-row>
-
+                        <el-row :gutter="25">
+                            <el-col :span="10"
+                                v-for="single_card in from_server.table_info.a_cards_on_table.slice(3,5)">
+                                <div style="width: 100%;">
+                                    <el-image :src="get_card_pic_url(single_card.color, single_card.num)" :fit="fill"></el-image>
+                                </div>
+                            </el-col>
+                        </el-row>
                     </el-col>
-                    <el-col :span="4">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6)">
+                    <el-col :span="6">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px'}"
+                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6)"
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 1) % 6 + 1)">
                             <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).seat_pos + 1}}号位
+                                {{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).name}}
                             </div>
                             <div>
-                            {{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).name}}
-                            </div>
-                            <div>
-                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).cur_cash}}</i>
+                                <i
+                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).cur_cash}}</i>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -151,10 +166,13 @@
                         </el-card>
                     </el-col>
                 </el-row>
+                <div>
+                    主池金额：{{from_server.table_info.i_cur_bat_cash}}
+                </div>
             </el-main>
             <el-footer v-if="from_server.table_info.i_table_no != -1">
                 <el-row :gutter="10">
-                    <el-col :span="8">
+                    <el-col :span="12">
                         <el-col :span="12">
                             <el-image
                                 :src="get_card_pic_url(from_server.self_info.a_hand_cards[0].color, from_server.self_info.a_hand_cards[0].num)">
@@ -169,44 +187,46 @@
                             <el-button type="primary" @click="get_ready">{{ready_button()}}</el-button>
                         </el-row>
                     </el-col>
-                    <el-col :span="8">
-                        <div v-if="from_server.self_info.i_self_seat != -1">
-                            <el-row>{{from_server.self_info.i_self_seat + 1}}号位</el-row>
+                    <el-col :span="12" class="self_show">
+                        <div v-if="from_server.self_info.i_self_seat != -1"
+                            :style="get_seat_back_style(from_server.self_info.i_self_seat + 1)">
                             <el-row>{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].name}}
                             </el-row>
                             <el-row>
-                                拥有金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].cur_cash}}
+                                <i
+                                    class="el-icon-coin">{{get_player_by_seat(from_server.self_info.i_self_seat).cur_cash}}</i>
                             </el-row>
                             <el-row>
                                 下注金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].bat_cash}}
                             </el-row>
                         </div>
                     </el-col>
-                    <el-col :span="8" v-if="from_server.table_info.i_action_pos == from_server.self_info.i_self_seat">
-                        <el-slider :min="get_min_bat_cash()" :max="get_max_bat_cash()"
-                            v-model="bind_var.cur_ready_to_bat"></el-slider>
-                        <el-row :gutter="10">
-                            <el-col :span="8">
-                                <el-button type="primary" @click="bat_half_pool">半池</el-button>
-                            </el-col>
-                            <el-col :span="8">
-                                <el-button type="primary" @click="bat_full_pool">全池</el-button>
-                            </el-col>
-                            <el-col :span="8">
-                                <el-button type="primary" @click="bat_double_pool">两倍池</el-button>
-                            </el-col>
-                        </el-row>
-                        <el-row>
-                            <el-button type="primary" @click="bat_cash_out">下注{{bind_var.cur_ready_to_bat}}
-                            </el-button>
-                        </el-row>
-                        <el-row>
-                            <el-button type="primary" @click="follow_action">过牌</el-button>
-                        </el-row>
-                        <el-row>
-                            <el-button type="primary" @click="give_up_action">弃牌</el-button>
-                        </el-row>
-                    </el-col>
+
+                </el-row>
+                <el-row v-if="from_server.table_info.i_action_pos == from_server.self_info.i_self_seat">
+                    <el-slider :min="get_min_bat_cash()" :max="get_max_bat_cash()" v-model="bind_var.cur_ready_to_bat">
+                    </el-slider>
+                    <el-row :gutter="10">
+                        <el-col :span="8">
+                            <el-button type="primary" @click="bat_half_pool">半池</el-button>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-button type="primary" @click="bat_full_pool">全池</el-button>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-button type="primary" @click="bat_double_pool">两倍池</el-button>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-button type="primary" @click="bat_cash_out">下注{{bind_var.cur_ready_to_bat}}
+                        </el-button>
+                    </el-row>
+                    <el-row>
+                        <el-button type="primary" @click="follow_action">过牌</el-button>
+                    </el-row>
+                    <el-row>
+                        <el-button type="primary" @click="give_up_action">弃牌</el-button>
+                    </el-row>
                 </el-row>
             </el-footer>
         </el-container>
@@ -237,6 +257,15 @@
 
                 return my_self_cash;
             },
+            get_seat_back_style: function (_seat) {
+                var img_url = "http://59.110.64.232/resource/number_background/red_num_0" + _seat + ".png";
+                console.log({ background: "url(" + img_url + ")" });
+                var size = '15%'
+                if (_seat == this.from_server.self_info.i_self_seat + 1) {
+                    size = '30%';
+                }
+                return { background: "url(" + img_url + ")", 'background-size': 'auto ' + size, 'background-repeat': "no-repeat" };
+            },
             get_self_player_info: function () {
                 for (const index in this.from_server.table_info.a_all_players) {
                     var ret = this.from_server.table_info.a_all_players[index];
@@ -253,7 +282,7 @@
                     return "准备";
                 }
             },
-            get_player_by_seat: function(_seat) {
+            get_player_by_seat: function (_seat) {
                 for (const key in this.from_server.table_info.a_all_players) {
                     if (this.from_server.table_info.a_all_players.hasOwnProperty(key)) {
                         const element = this.from_server.table_info.a_all_players[key];
