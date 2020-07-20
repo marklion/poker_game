@@ -16,6 +16,13 @@
             display: block;
             width: 100%;
         }
+
+        .each_player_show {
+            background-color: antiquewhite;
+            font-size: small;
+            padding: 1px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -37,7 +44,7 @@
                 </el-row>
                 <el-row v-if="from_server.table_info.i_table_no != -1">
                     <el-col :span="20">
-                        <h1 >{{from_server.table_info.i_table_no}}号桌</h1>
+                        <h1>{{from_server.table_info.i_table_no}}号桌</h1>
                     </el-col>
                     <el-col :span="4">
                         <el-button type="primary" @click="disconnect_from_server">离开</el-button>
@@ -45,18 +52,103 @@
                 </el-row>
             </el-header>
             <el-main v-if="from_server.table_info.i_table_no != -1">
-                <el-row :gutter="10">
-                    <el-col :span="4" v-for="player in get_players_on_table()"
-                        v-if="player.seat_pos != from_server.self_info.i_self_seat">
-                        <div>{{player.seat_pos + 1}}号位</div>
-                        <div>{{player.name}}</div>
-                        <div>拥有金额{{player.cur_cash}}</div>
-                        <div>下注金额{{player.bat_cash}}</div>
+                <el-row :gutter="12">
+                    <el-col :span="8">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6)">
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).seat_pos + 1}}号位
+                            </div>
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).name}}
+                            </div>
+                            <div>
+                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).cur_cash}}</i>
+                            </div>
+                        </el-card>
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
+                            无玩家
+                        </el-card>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6)">
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).seat_pos + 1}}号位
+                            </div>
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).name}}
+                            </div>
+                            <div>
+                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).cur_cash}}</i>
+                            </div>
+                        </el-card>
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
+                            无玩家
+                        </el-card>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6)">
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).seat_pos + 1}}号位
+                            </div>
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).name}}
+                            </div>
+                            <div>
+                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).cur_cash}}</i>
+                            </div>
+                        </el-card>
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
+                            无玩家
+                        </el-card>
                     </el-col>
                 </el-row>
-                <el-row :gutter="10">
-                    <el-col :span="4" v-for="single_card in from_server.table_info.a_cards_on_table">
-                        <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
+                <el-row :gutter="12">
+                    <el-col :span="4">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6)">
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).seat_pos + 1}}号位
+                            </div>
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).name}}
+                            </div>
+                            <div>
+                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).cur_cash}}</i>
+                            </div>
+                        </el-card>
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
+                            无玩家
+                        </el-card>
+                    </el-col>
+                    <el-col :span="16">
+                        <el-row :gutter="5">
+                            <el-col :span="15">
+                                <el-col :span="8" v-for="single_card in from_server.table_info.a_cards_on_table.slice(0,3)">
+                                    <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
+                                </el-col>
+                            </el-col>
+                            <el-col :span="9">
+                                <el-col :span="12" v-for="single_card in from_server.table_info.a_cards_on_table.slice(3,5)">
+                                    <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
+                                </el-col>
+                            </el-col>
+                        </el-row>
+
+                    </el-col>
+                    <el-col :span="4">
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6)">
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).seat_pos + 1}}号位
+                            </div>
+                            <div>
+                            {{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).name}}
+                            </div>
+                            <div>
+                                <i class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).cur_cash}}</i>
+                            </div>
+                        </el-card>
+                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
+                            无玩家
+                        </el-card>
                     </el-col>
                 </el-row>
             </el-main>
@@ -90,8 +182,9 @@
                             </el-row>
                         </div>
                     </el-col>
-                    <el-col :span="8">
-                        <el-slider :min="get_min_bat_cash()" :max="get_max_bat_cash()" v-model="bind_var.cur_ready_to_bat"></el-slider>
+                    <el-col :span="8" v-if="from_server.table_info.i_action_pos == from_server.self_info.i_self_seat">
+                        <el-slider :min="get_min_bat_cash()" :max="get_max_bat_cash()"
+                            v-model="bind_var.cur_ready_to_bat"></el-slider>
                         <el-row :gutter="10">
                             <el-col :span="8">
                                 <el-button type="primary" @click="bat_half_pool">半池</el-button>
@@ -135,32 +228,39 @@
             status_var: {
                 has_not_login: true,
             },
-            get_min_bat_cash: function() {
+            get_min_bat_cash: function () {
                 return this.from_server.table_info.i_min_bat_cash * 2;
             },
-            get_max_bat_cash: function() {
+            get_max_bat_cash: function () {
                 var self_player = this.get_self_player_info();
                 var my_self_cash = self_player.bat_cash + self_player.cur_cash;
 
                 return my_self_cash;
             },
-            get_self_player_info: function() {
+            get_self_player_info: function () {
                 for (const index in this.from_server.table_info.a_all_players) {
                     var ret = this.from_server.table_info.a_all_players[index];
-                    if (ret.seat_pos == this.from_server.self_info.i_self_seat)
-                    {
+                    if (ret.seat_pos == this.from_server.self_info.i_self_seat) {
                         return ret;
                     }
                 }
             },
-            ready_button: function() {
-                if (this.get_self_ready())
-                {
+            ready_button: function () {
+                if (this.get_self_ready()) {
                     return "取消准备";
                 }
-                else
-                {
+                else {
                     return "准备";
+                }
+            },
+            get_player_by_seat: function(_seat) {
+                for (const key in this.from_server.table_info.a_all_players) {
+                    if (this.from_server.table_info.a_all_players.hasOwnProperty(key)) {
+                        const element = this.from_server.table_info.a_all_players[key];
+                        if (element.seat_pos == _seat) {
+                            return element;
+                        }
+                    }
                 }
             },
             get_card_pic_url: function (color, number) {
@@ -430,12 +530,10 @@
                 new DataView(msg, 40).setInt32(0, Number(this.bind_var.input_table_no));
                 this.ws_socket.send(msg);
             },
-            get_self_ready: function() {
+            get_self_ready: function () {
                 for (const element in this.from_server.table_info.a_all_players) {
-                    if (this.from_server.table_info.a_all_players[element].seat_pos == this.from_server.self_info.i_self_seat)
-                    {
-                        if (this.from_server.table_info.a_all_players[element].is_ready)
-                        {
+                    if (this.from_server.table_info.a_all_players[element].seat_pos == this.from_server.self_info.i_self_seat) {
+                        if (this.from_server.table_info.a_all_players[element].is_ready) {
                             return true;
                         }
                     }
@@ -443,7 +541,7 @@
                 return false;
             },
 
-            get_ready: function() {
+            get_ready: function () {
                 var msg = new ArrayBuffer(44);
                 var ssid_buff = new Uint8Array(msg);
                 for (let index = 0; index < this.ssid.length; index++) {
@@ -461,40 +559,45 @@
                 this.ws_socket.send(msg);
             },
 
-            disconnect_from_server: function() {
+            disconnect_from_server: function () {
                 this.ws_socket.close();
                 location.reload(true);
             },
-            bat_half_pool: function() {
+            bat_half_pool: function () {
                 var tmp_cash = this.from_server.table_info.i_cur_bat_cash / 2;
                 this.bat_some_cash_ready(tmp_cash);
             },
-            bat_full_pool: function() {
+            bat_full_pool: function () {
                 var tmp_cash = this.from_server.table_info.i_cur_bat_cash;
                 this.bat_some_cash_ready(tmp_cash);
             },
-            bat_double_pool: function() {
+            bat_double_pool: function () {
                 var tmp_cash = this.from_server.table_info.i_cur_bat_cash * 2;
                 this.bat_some_cash_ready(tmp_cash);
             },
-            bat_some_cash_ready: function(tmp_cash) {
+            bat_some_cash_ready: function (tmp_cash) {
                 if (tmp_cash < this.get_min_bat_cash()) {
                     this.bind_var.cur_ready_to_bat = this.get_min_bat_cash();
                 }
-                else if (tmp_cash > this.get_max_bat_cash())
-                {
+                else if (tmp_cash > this.get_max_bat_cash()) {
                     this.bind_var.cur_ready_to_bat = this.get_max_bat_cash();
                 }
-                else
-                {
+                else {
                     this.bind_var.cur_ready_to_bat = tmp_cash;
                 }
 
             },
-            bat_cash_out: function() {
+            bat_cash_out: function () {
+                this.send_bat_req(2, this.bind_var.cur_ready_to_bat);
+            },
+            follow_action: function () {
+                this.send_bat_req(0, this.from_server.table_info.i_min_bat_cash);
+            },
+            give_up_action: function () {
+                this.send_bat_req(4, 0);
 
             },
-            send_bat_req: function(_action, _bat_cash) {
+            send_bat_req: function (_action, _bat_cash) {
                 var msg = new ArrayBuffer(48);
                 var ssid_buff = new Uint8Array(msg);
                 for (let index = 0; index < this.ssid.length; index++) {
@@ -504,6 +607,7 @@
                 new DataView(msg, 36).setUint32(0, 8);
                 new DataView(msg, 40).setUint32(0, _action);
                 new DataView(msg, 44).setUint32(0, _bat_cash);
+                this.ws_socket.send(msg);
             }
 
         }
