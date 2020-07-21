@@ -29,6 +29,37 @@
             height: 80px;
         }
 
+        .blink_card {
+            -webkit-animation: twinkling 1s infinite ease-in-out
+        }
+
+        .animated {
+            -webkit-animation-duration: 1s;
+            animation-duration: 1s;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both
+        }
+
+        @-webkit-keyframes twinkling {
+            0% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes twinkling {
+            0% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
         .self_show {
             font-size: small;
             padding: 1px;
@@ -37,6 +68,26 @@
             background-repeat: no-repeat;
             color: darkgreen;
             line-height: 100%;
+        }
+
+        .number_show {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            font-weight: bolder;
+            color: beige;
+            background-color: green;
+        }
+
+        .number_show_bat {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            font-weight: bolder;
+            color: beige;
+            background-color: red;
+        }
+        .count_down {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            font-weight: bolder;
+            color:crimson;
+            background-color:darksalmon;
         }
     </style>
 </head>
@@ -66,22 +117,32 @@
                     </el-col>
                 </el-row>
             </el-header>
-            <el-main v-if="from_server.table_info.i_table_no != -1" style="height: 300px;">
+            <el-main v-if="from_server.table_info.i_table_no != -1" style="height: inherit;">
                 <el-row :gutter="12" style="height: 30%;">
                     <el-col :span="8">
                         <el-card class="each_player_show" :body-style="{ padding: '0px'}"
                             v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 4) % 6 + 1)">
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 4) % 6 + 1)"
+                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 4) % 6)}">
                             <div>
                                 {{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).name}}
                             </div>
                             <div>
                                 <i
-                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).cur_cash}}</i>
+                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).cur_cash}}</i>
+                            </div>
+                            <div>
+                                <i
+                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).bat_cash}}</i>
+                            </div>
+                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 4) % 6].timer_id">
+                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 4) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
-                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).is_ready">已准备</el-tag>
-                            <el-tag type="danger" v-else>未准备</el-tag>
+                                <el-tag type="success"
+                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).is_ready">已准备
+                                </el-tag>
+                                <el-tag type="danger" v-else>未准备</el-tag>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -91,17 +152,27 @@
                     <el-col :span="8">
                         <el-card class="each_player_show" :body-style="{ padding: '0px'}"
                             v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 3) % 6 + 1)">
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 3) % 6 + 1)"
+                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 3) % 6)}">
                             <div>
                                 {{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).name}}
                             </div>
                             <div>
                                 <i
-                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).cur_cash}}</i>
+                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).cur_cash}}</i>
+                            </div>
+                            <div>
+                                <i
+                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).bat_cash}}</i>
+                            </div>
+                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 3) % 6].timer_id">
+                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 3) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
-                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).is_ready">已准备</el-tag>
-                            <el-tag type="danger" v-else>未准备</el-tag>
+                                <el-tag type="success"
+                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).is_ready">已准备
+                                </el-tag>
+                                <el-tag type="danger" v-else>未准备</el-tag>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -111,17 +182,27 @@
                     <el-col :span="8">
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }"
                             v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 2) % 6 + 1)">
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 2) % 6 + 1)"
+                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 2) % 6)}">
                             <div>
                                 {{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).name}}
                             </div>
                             <div>
                                 <i
-                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).cur_cash}}</i>
+                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).cur_cash}}</i>
+                            </div>
+                            <div>
+                                <i
+                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).bat_cash}}</i>
+                            </div>
+                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 2) % 6].timer_id">
+                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 2) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
-                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).is_ready">已准备</el-tag>
-                            <el-tag type="danger" v-else>未准备</el-tag>
+                                <el-tag type="success"
+                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).is_ready">已准备
+                                </el-tag>
+                                <el-tag type="danger" v-else>未准备</el-tag>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -129,21 +210,31 @@
                         </el-card>
                     </el-col>
                 </el-row>
-                <el-row :gutter="5" style="height: 70%;">
+                <el-row :gutter="5" style="height: 60%;">
                     <el-col :span="6">
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }"
                             v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 5) % 6 + 1)">
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 5) % 6 + 1)"
+                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 5) % 6)}">
                             <div>
                                 {{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).name}}
                             </div>
                             <div>
                                 <i
-                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).cur_cash}}</i>
+                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).cur_cash}}</i>
+                            </div>
+                            <div>
+                                <i
+                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).bat_cash}}</i>
+                            </div>
+                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 5) % 6].timer_id">
+                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 5) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
-                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).is_ready">已准备</el-tag>
-                            <el-tag type="danger" v-else>未准备</el-tag>
+                                <el-tag type="success"
+                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).is_ready">已准备
+                                </el-tag>
+                                <el-tag type="danger" v-else>未准备</el-tag>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -168,17 +259,27 @@
                     <el-col :span="6">
                         <el-card class="each_player_show" :body-style="{ padding: '0px'}"
                             v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 1) % 6 + 1)">
+                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 1) % 6 + 1)"
+                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 1) % 6)}">
                             <div>
                                 {{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).name}}
                             </div>
                             <div>
                                 <i
-                                    class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).cur_cash}}</i>
+                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).cur_cash}}</i>
+                            </div>
+                            <div>
+                                <i
+                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).bat_cash}}</i>
+                            </div>
+                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 1) % 6].timer_id">
+                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 1) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
-                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).is_ready">已准备</el-tag>
-                            <el-tag type="danger" v-else>未准备</el-tag>
+                                <el-tag type="success"
+                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).is_ready">已准备
+                                </el-tag>
+                                <el-tag type="danger" v-else>未准备</el-tag>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -214,14 +315,17 @@
                             </el-row>
                             <el-row>
                                 <i
-                                    class="el-icon-coin">{{get_player_by_seat(from_server.self_info.i_self_seat).cur_cash}}</i>
+                                    class="el-icon-coin number_show">{{get_player_by_seat(from_server.self_info.i_self_seat).cur_cash}}</i>
                             </el-row>
-                            <el-row>
-                                下注金额{{from_server.table_info.a_all_players[from_server.self_info.i_self_seat].bat_cash}}
-                            </el-row>
+                            <div>
+                                <i
+                                    class="el-icon-download number_show_bat">{{get_player_by_seat(from_server.self_info.i_self_seat).bat_cash}}</i>
+                            </div>
+                            <div class="count_down" v-if="timers_on_seat[from_server.self_info.i_self_seat].timer_id">
+                                倒计时{{timers_on_seat[from_server.self_info.i_self_seat].left_sec}}
+                            </div>
                         </div>
                     </el-col>
-
                 </el-row>
                 <el-row v-if="from_server.table_info.i_action_pos == from_server.self_info.i_self_seat">
                     <el-slider :min="get_min_bat_cash()" :max="get_max_bat_cash()" v-model="bind_var.cur_ready_to_bat">
@@ -238,11 +342,12 @@
                         </el-col>
                     </el-row>
                     <el-row>
-                        <el-button type="primary" @click="bat_cash_out">下注{{bind_var.cur_ready_to_bat}}
+                        <el-button type="primary" @click="bat_cash_out">
+                            {{get_bat_btn_name()}}{{bind_var.cur_ready_to_bat}}
                         </el-button>
                     </el-row>
                     <el-row>
-                        <el-button type="primary" @click="follow_action">过牌</el-button>
+                        <el-button type="primary" @click="follow_action">{{get_follow_btn_name()}}</el-button>
                     </el-row>
                     <el-row>
                         <el-button type="primary" @click="give_up_action">弃牌</el-button>
@@ -268,6 +373,53 @@
             status_var: {
                 has_not_login: true,
             },
+            timers_on_seat: [
+                {
+                    left_sec:20,
+                    timer_id:null
+                },
+                {
+                    left_sec:20,
+                    timer_id:null
+                },
+                {
+                    left_sec:20,
+                    timer_id:null
+                },
+                {
+                    left_sec:20,
+                    timer_id:null
+                },
+                {
+                    left_sec:20,
+                    timer_id:null
+                },
+                {
+                    left_sec:20,
+                    timer_id:null
+                },
+            ],
+            get_bat_btn_name: function () {
+                if (this.from_server.table_info.i_min_bat_cash > 0) {
+                    return "加注";
+                }
+                else {
+                    return "下注";
+                }
+            },
+            is_action_pos: function(_seat) {
+                return this.from_server.table_info.i_action_pos == _seat;
+            },
+            get_follow_btn_name: function () {
+                if (this.get_player_by_seat(this.from_server.self_info.i_self_seat).bat_cash < this.from_server.table_info.i_min_bat_cash) {
+                    var call_cash = this.get_player_by_seat(this.from_server.self_info.i_self_seat).cur_cash;
+                    call_cash = call_cash < this.from_server.table_info.i_min_bat_cash ? call_cash : this.from_server.table_info.i_min_bat_cash;
+                    return "跟注" + call_cash;
+                }
+                else {
+                    return "过牌";
+                }
+            },
             get_min_bat_cash: function () {
                 return this.from_server.table_info.i_min_bat_cash * 2;
             },
@@ -284,7 +436,7 @@
                 if (_seat == this.from_server.self_info.i_self_seat + 1) {
                     size = '30%';
                 }
-                return { background: "url(" + img_url + ")", 'background-size': 'auto ' + size, 'background-repeat': "no-repeat" };
+                return { background: "url(" + img_url + ")", 'background-size': 'auto ' + size, 'background-repeat': "no-repeat" , 'background-color': "pink"};
             },
             get_self_player_info: function () {
                 for (const index in this.from_server.table_info.a_all_players) {
@@ -548,11 +700,43 @@
                             }
 
                         }
+                        vue_this.fresh_timer();
                         console.log(vue_this);
                     };
                 }).catch(function (err) {
                     console.log(err);
                 });
+            },
+            fresh_timer: function() {
+                if (this.from_server.table_info.i_action_pos >= 0)
+                {
+                    if (this.timers_on_seat[this.from_server.table_info.i_action_pos].timer_id == null)
+                    {
+                        this.timers_on_seat[this.from_server.table_info.i_action_pos].left_sec = 20;
+                        var vue_this = this;
+                        this.timers_on_seat[this.from_server.table_info.i_action_pos].timer_id = setInterval(() => {
+                            vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].left_sec--;
+                            console.log(vue_this);
+                            if (0 >= vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].left_sec)
+                            {
+                                clearInterval(vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].timer_id);
+                                vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].timer_id = null;
+                            }
+                        }, 1000);
+                    }
+                    var vue_this = this;
+                    this.timers_on_seat.forEach((element, index) => {
+                        if (index == vue_this.from_server.table_info.i_action_pos)
+                        {
+                            return;
+                        }
+                        if (element.timer_id != null)
+                        {
+                            clearInterval(element.timer_id);
+                            element.timer_id = null;
+                        }
+                    });
+                }
             },
             create_room: function (event) {
                 var msg = new ArrayBuffer(40);
