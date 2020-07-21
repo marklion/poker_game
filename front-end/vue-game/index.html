@@ -26,7 +26,7 @@
             background-size: auto 100%;
             background-repeat: no-repeat;
             color: darkgreen;
-            line-height: 600%;
+            height: 80px;
         }
 
         .self_show {
@@ -66,8 +66,8 @@
                     </el-col>
                 </el-row>
             </el-header>
-            <el-main v-if="from_server.table_info.i_table_no != -1">
-                <el-row :gutter="12">
+            <el-main v-if="from_server.table_info.i_table_no != -1" style="height: 300px;">
+                <el-row :gutter="12" style="height: 30%;">
                     <el-col :span="8">
                         <el-card class="each_player_show" :body-style="{ padding: '0px'}"
                             v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6)"
@@ -79,13 +79,17 @@
                                 <i
                                     class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).cur_cash}}</i>
                             </div>
+                            <div v-if="!from_server.table_info.b_game_start">
+                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).is_ready">已准备</el-tag>
+                            <el-tag type="danger" v-else>未准备</el-tag>
+                            </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
                             无玩家
                         </el-card>
                     </el-col>
                     <el-col :span="8">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }"
+                        <el-card class="each_player_show" :body-style="{ padding: '0px'}"
                             v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6)"
                             :style="get_seat_back_style((from_server.self_info.i_self_seat + 3) % 6 + 1)">
                             <div>
@@ -94,6 +98,10 @@
                             <div>
                                 <i
                                     class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).cur_cash}}</i>
+                            </div>
+                            <div v-if="!from_server.table_info.b_game_start">
+                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).is_ready">已准备</el-tag>
+                            <el-tag type="danger" v-else>未准备</el-tag>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -111,13 +119,17 @@
                                 <i
                                     class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).cur_cash}}</i>
                             </div>
+                            <div v-if="!from_server.table_info.b_game_start">
+                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).is_ready">已准备</el-tag>
+                            <el-tag type="danger" v-else>未准备</el-tag>
+                            </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
                             无玩家
                         </el-card>
                     </el-col>
                 </el-row>
-                <el-row :gutter="5">
+                <el-row :gutter="5" style="height: 70%;">
                     <el-col :span="6">
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }"
                             v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6)"
@@ -128,6 +140,10 @@
                             <div>
                                 <i
                                     class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).cur_cash}}</i>
+                            </div>
+                            <div v-if="!from_server.table_info.b_game_start">
+                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).is_ready">已准备</el-tag>
+                            <el-tag type="danger" v-else>未准备</el-tag>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
@@ -144,7 +160,7 @@
                             <el-col :span="10"
                                 v-for="single_card in from_server.table_info.a_cards_on_table.slice(3,5)">
                                 <div style="width: 100%;">
-                                    <el-image :src="get_card_pic_url(single_card.color, single_card.num)" :fit="fill"></el-image>
+                                    <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
                                 </div>
                             </el-col>
                         </el-row>
@@ -159,6 +175,10 @@
                             <div>
                                 <i
                                     class="el-icon-coin">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).cur_cash}}</i>
+                            </div>
+                            <div v-if="!from_server.table_info.b_game_start">
+                            <el-tag type="success" v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).is_ready">已准备</el-tag>
+                            <el-tag type="danger" v-else>未准备</el-tag>
                             </div>
                         </el-card>
                         <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
