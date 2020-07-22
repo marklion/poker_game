@@ -361,7 +361,7 @@
                 </el-row>
             </el-footer>
         </el-container>
-        <el-dialog title="秀牌" :visible.sync="need_cards_result()" width="100%" v-on:opened="refresh_player_cash">
+        <el-dialog title="秀牌" :show-close='false' :visible.sync="need_cards_result()" width="100%" v-on:opened="refresh_player_cash">
             <el-row v-for="(single_result, index) in from_server.last_result.a_all_result" v-if="get_player_by_seat(index)">
                 <el-col :span="8">
                     <p>{{index + 1}}号位 {{get_player_by_seat(index).name}}</p>
@@ -376,6 +376,9 @@
                     </el-col>
                 </el-col>
             </el-row>
+        </el-dialog>
+        <el-dialog title="输光了" :show-close="false" :visible.sync="failure_flag" width="100%">
+            <el-button @click="disconnect_from_server">重来</el-button>
         </el-dialog>
     </div>
 </body>
@@ -392,6 +395,7 @@
                 cur_ready_to_bat: 0,
                 input_table_no: '',
             },
+            failure_flag: false,
             status_var: {
                 has_not_login: true,
                 cash_before_show: [0, 0, 0, 0, 0, 0]
@@ -472,7 +476,7 @@
             },
             get_follow_btn_name: function () {
                 if (this.get_player_by_seat(this.from_server.self_info.i_self_seat).bat_cash < this.from_server.table_info.i_min_bat_cash) {
-                    var call_cash = this.get_player_by_seat(this.from_server.self_info.i_self_seat).cur_cash;
+                    var call_cash = this.get_player_by_seat(this.from_server.self_info.i_self_seat).cur_cash + this.get_player_by_seat(this.from_server.self_info.i_self_seat).bat_cash;
                     call_cash = call_cash < this.from_server.table_info.i_min_bat_cash ? call_cash : this.from_server.table_info.i_min_bat_cash;
                     return "跟注" + call_cash;
                 }
@@ -736,6 +740,21 @@
                     vue_this.ws_socket.binaryType = "arraybuffer";
                     vue_this.ws_socket.onopen = function (evt) {
                         vue_this.status_var.has_not_login = false;
+                        vue_this.heart_timer = setInterval(() => {
+                            var msg = new ArrayBuffer(46);
+                            var ssid_buff = new Uint8Array(msg);
+                            for (let index = 0; index < vue_this.ssid.length; index++) {
+                                ssid_buff[index] = vue_this.ssid.charCodeAt(index);
+                            }
+                            new DataView(msg, 32).setUint32(0, 5);
+                            new DataView(msg, 36).setUint32(0, 6);
+
+                            this.ws_socket.send(msg);
+                        }, 1000);
+                    };
+                    vue_this.ws_socket.onclose = function(evt) {
+                        clearInterval(vue_this.heart_timer);
+                        vue_this.failure_flag = true;
                     };
                     vue_this.ws_socket.onmessage = function (event) {
                         var total_length = event.data.byteLength;

@@ -721,7 +721,7 @@ card_pattern make_fullhouse_or_set(const wait_pat &_cards)
                     std::vector<single_card> ret_tmp = tmp;
                     ret_tmp.erase(ret_tmp.begin() + j, ret_tmp.begin() + j + 2);
                     ret_tmp.insert(ret_tmp.begin() + 3, tmp.begin() + j, tmp.begin() + j + 2);
-                    return card_pattern(card_pattern::flush, ret_tmp.data());
+                    return card_pattern(card_pattern::fullhouse, ret_tmp.data());
                 }
             }
 
