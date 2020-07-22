@@ -7,7 +7,7 @@ build_front_end()
 {
     echo "building front end"
     mkdir -p "$BUILD_DIR/front-end-build"
-    docker run --rm -v "${PRJ_SRC_DIR}/front-end/poker_game/":/src -v "${BUILD_DIR}/front-end-build/":/build_dir  -u 0:0 marklion/front-web-assembly-build:v1.0
+    cp "${PRJ_SRC_DIR}/front-end/vue-game/*" "${BUILD_DIR}/front-end-build/"
     [ $? != 0 ] && exit 1
 }
 
@@ -25,7 +25,6 @@ build_back_end()
 prepare_docker()
 {
     echo "prepare docker"
-    docker pull marklion/front-web-assembly-build:v1.0
     docker pull marklion/back-end-build:v1.0
     docker pull marklion/poker_deploy:v1.0
 }
@@ -35,11 +34,7 @@ make_package()
     local package_path="$BUILD_DIR/package-$timestamp"
     mkdir -p $package_path
 
-    cp ${BUILD_DIR}/front-end-build/poker_game.html   ${package_path}/index.html
-    cp ${BUILD_DIR}/front-end-build/poker_game.js ${package_path}
-    cp ${BUILD_DIR}/front-end-build/poker_game.wasm    ${package_path}
-    cp ${BUILD_DIR}/front-end-build/qtloader.js ${package_path}
-    cp ${BUILD_DIR}/front-end-build/qtlogo.svg ${package_path}
+    cp ${BUILD_DIR}/front-end-build/index.html   ${package_path}/index.html
     mkdir -p $package_path/resource
     cp ${PRJ_SRC_DIR}/back-end/resouce_http/* -a ${package_path}/resource
     mkdir -p $package_path/game_server

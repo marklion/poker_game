@@ -12,12 +12,7 @@ mkdir -p $PRJ_DEPLOY_DIR
 front_end_deploy()
 {
     echo "front"
-    cp ${BUILD_DIR}/front-end-build/poker_game.html   ${PRJ_DEPLOY_DIR}/index.html
-    cp ${BUILD_DIR}/front-end-build/poker_game.js ${PRJ_DEPLOY_DIR}
-    cp ${BUILD_DIR}/front-end-build/poker_game.wasm    ${PRJ_DEPLOY_DIR}
-    cp ${BUILD_DIR}/front-end-build/qtloader.js ${PRJ_DEPLOY_DIR}
-    cp ${BUILD_DIR}/front-end-build/qtlogo.svg ${PRJ_DEPLOY_DIR}
-    cp ${PRJ_SRC_DIR}/front-end/vue-game/index.html ${PRJ_DEPLOY_DIR}/index-test.html
+    cp ${BUILD_DIR}/front-end-build/index.html   ${PRJ_DEPLOY_DIR}/index.html
 }
 resouce_deploy()
 {
