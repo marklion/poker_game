@@ -83,11 +83,12 @@
             color: beige;
             background-color: red;
         }
+
         .count_down {
             font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
             font-weight: bolder;
-            color:crimson;
-            background-color:darksalmon;
+            color: crimson;
+            background-color: darksalmon;
         }
     </style>
 </head>
@@ -135,7 +136,8 @@
                                 <i
                                     class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).bat_cash}}</i>
                             </div>
-                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 4) % 6].timer_id">
+                            <div class="count_down"
+                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 4) % 6].timer_id">
                                 倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 4) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
@@ -165,7 +167,8 @@
                                 <i
                                     class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).bat_cash}}</i>
                             </div>
-                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 3) % 6].timer_id">
+                            <div class="count_down"
+                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 3) % 6].timer_id">
                                 倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 3) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
@@ -195,7 +198,8 @@
                                 <i
                                     class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).bat_cash}}</i>
                             </div>
-                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 2) % 6].timer_id">
+                            <div class="count_down"
+                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 2) % 6].timer_id">
                                 倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 2) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
@@ -227,7 +231,8 @@
                                 <i
                                     class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).bat_cash}}</i>
                             </div>
-                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 5) % 6].timer_id">
+                            <div class="count_down"
+                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 5) % 6].timer_id">
                                 倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 5) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
@@ -272,7 +277,8 @@
                                 <i
                                     class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).bat_cash}}</i>
                             </div>
-                            <div class="count_down" v-if="timers_on_seat[(from_server.self_info.i_self_seat + 1) % 6].timer_id">
+                            <div class="count_down"
+                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 1) % 6].timer_id">
                                 倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 1) % 6].left_sec}}
                             </div>
                             <div v-if="!from_server.table_info.b_game_start">
@@ -355,6 +361,22 @@
                 </el-row>
             </el-footer>
         </el-container>
+        <el-dialog title="秀牌" :visible.sync="need_cards_result()" width="100%" v-on:opened="refresh_player_cash">
+            <el-row v-for="(single_result, index) in from_server.last_result.a_all_result" v-if="get_player_by_seat(index)">
+                <el-col :span="8">
+                    <p>{{index + 1}}号位 {{get_player_by_seat(index).name}}</p>
+                </el-col>
+                <el-col :span="6">
+                    <p v-if="single_result.b_show">{{get_pattern_name(single_result.en_patten_type)}}</p>
+                    <p>{{get_cash_change(index)}}</p>
+                </el-col>
+                <el-col :span="10" v-if="single_result.b_show">
+                    <el-col :span="4" v-for="single_card in single_result.a_final_pattern">
+                        <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
+                    </el-col>
+                </el-col>
+            </el-row>
+        </el-dialog>
     </div>
 </body>
 <!-- import Vue before Element -->
@@ -372,33 +394,71 @@
             },
             status_var: {
                 has_not_login: true,
+                cash_before_show: [0, 0, 0, 0, 0, 0]
             },
             timers_on_seat: [
                 {
-                    left_sec:20,
-                    timer_id:null
+                    left_sec: 20,
+                    timer_id: null
                 },
                 {
-                    left_sec:20,
-                    timer_id:null
+                    left_sec: 20,
+                    timer_id: null
                 },
                 {
-                    left_sec:20,
-                    timer_id:null
+                    left_sec: 20,
+                    timer_id: null
                 },
                 {
-                    left_sec:20,
-                    timer_id:null
+                    left_sec: 20,
+                    timer_id: null
                 },
                 {
-                    left_sec:20,
-                    timer_id:null
+                    left_sec: 20,
+                    timer_id: null
                 },
                 {
-                    left_sec:20,
-                    timer_id:null
+                    left_sec: 20,
+                    timer_id: null
                 },
             ],
+            get_pattern_name: function (_patten_en) {
+                var ret = "";
+                switch (_patten_en) {
+                    case 0:
+                        ret = "高牌";
+                        break;
+                    case 1:
+                        ret = "对子";
+                        break;
+                    case 2:
+                        ret = "两对";
+                        break;
+                    case 3:
+                        ret = "三条";
+                        break;
+                    case 4:
+                        ret = "顺子";
+                        break;
+                    case 5:
+                        ret = "同花";
+                        break;
+                    case 6:
+                        ret = "葫芦";
+                        break;
+                    case 7:
+                        ret = "四条";
+                        break;
+                    case 8:
+                        ret = "同花顺";
+                        break;
+                    case 9:
+                        ret = "";
+                        break;
+                }
+
+                return ret;
+            },
             get_bat_btn_name: function () {
                 if (this.from_server.table_info.i_min_bat_cash > 0) {
                     return "加注";
@@ -407,7 +467,7 @@
                     return "下注";
                 }
             },
-            is_action_pos: function(_seat) {
+            is_action_pos: function (_seat) {
                 return this.from_server.table_info.i_action_pos == _seat;
             },
             get_follow_btn_name: function () {
@@ -431,12 +491,11 @@
             },
             get_seat_back_style: function (_seat) {
                 var img_url = "http://59.110.64.232/resource/number_background/red_num_0" + _seat + ".png";
-                console.log({ background: "url(" + img_url + ")" });
                 var size = '15%'
                 if (_seat == this.from_server.self_info.i_self_seat + 1) {
                     size = '30%';
                 }
-                return { background: "url(" + img_url + ")", 'background-size': 'auto ' + size, 'background-repeat': "no-repeat" , 'background-color': "pink"};
+                return { background: "url(" + img_url + ")", 'background-size': 'auto ' + size, 'background-repeat': "no-repeat", 'background-color': "pink" };
             },
             get_self_player_info: function () {
                 for (const index in this.from_server.table_info.a_all_players) {
@@ -471,6 +530,25 @@
                 }
                 else {
                     return "http://59.110.64.232/resource/cards_imgs/" + color_map[color] + "_" + number + ".jpg";
+                }
+            },
+            need_cards_result: function () {
+                if (this.from_server.table_info.i_action_pos == -1 && this.from_server.table_info.b_game_start) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            get_cash_change: function (_seat) {
+                if (this.get_player_by_seat(_seat).cur_cash > this.status_var.cash_before_show[_seat]) {
+                    return "赢" + (this.get_player_by_seat(_seat).cur_cash - this.status_var.cash_before_show[_seat]);
+                }
+                else if (this.get_player_by_seat(_seat).cur_cash < this.status_var.cash_before_show[_seat]) {
+                    return "输" + (this.status_var.cash_before_show[_seat] - this.get_player_by_seat(_seat).cur_cash);
+                }
+                else {
+                    return "无变化";
                 }
             },
             from_server: {
@@ -642,6 +720,14 @@
             },
         },
         methods: {
+            refresh_player_cash: function () {
+                var vue_this = this;
+                this.status_var.cash_before_show.forEach((element, index) => {
+                    if (vue_this.get_player_by_seat(index)) {
+                        vue_this.status_var.cash_before_show[index] = vue_this.get_player_by_seat(index).cur_cash;
+                    }
+                });
+            },
             random_login: function (event) {
                 vue_this = this;
                 axios.get('http://59.110.64.232/user_manage/login_random').then(function (resp) {
@@ -652,7 +738,6 @@
                         vue_this.status_var.has_not_login = false;
                     };
                     vue_this.ws_socket.onmessage = function (event) {
-                        console.log(event);
                         var total_length = event.data.byteLength;
                         var left_length = total_length;
                         while (left_length > 0) {
@@ -693,32 +778,34 @@
                                     });
                                     break;
                                 case 8:
-
+                                    var last_result_msg = new DataView(from_server_data, 32 + 8);
+                                    vue_this.from_server.last_result.a_all_result.forEach((element, index) => {
+                                        element.b_show = last_result_msg.getInt32(0 + index * 48);
+                                        element.en_patten_type = last_result_msg.getInt32(4 + index * 48);
+                                        element.a_final_pattern.forEach((sin_card, i) => {
+                                            sin_card.color = last_result_msg.getInt32(8 + index * 48 + i * 8);
+                                            sin_card.num = last_result_msg.getInt32(12 + index * 48 + i * 8);
+                                        });
+                                    });
                                     break;
                                 default:
                                     break;
                             }
-
                         }
                         vue_this.fresh_timer();
-                        console.log(vue_this);
                     };
                 }).catch(function (err) {
                     console.log(err);
                 });
             },
-            fresh_timer: function() {
-                if (this.from_server.table_info.i_action_pos >= 0)
-                {
-                    if (this.timers_on_seat[this.from_server.table_info.i_action_pos].timer_id == null)
-                    {
+            fresh_timer: function () {
+                if (this.from_server.table_info.i_action_pos >= 0) {
+                    if (this.timers_on_seat[this.from_server.table_info.i_action_pos].timer_id == null) {
                         this.timers_on_seat[this.from_server.table_info.i_action_pos].left_sec = 20;
                         var vue_this = this;
                         this.timers_on_seat[this.from_server.table_info.i_action_pos].timer_id = setInterval(() => {
                             vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].left_sec--;
-                            console.log(vue_this);
-                            if (0 >= vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].left_sec)
-                            {
+                            if (0 >= vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].left_sec) {
                                 clearInterval(vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].timer_id);
                                 vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].timer_id = null;
                             }
@@ -726,12 +813,10 @@
                     }
                     var vue_this = this;
                     this.timers_on_seat.forEach((element, index) => {
-                        if (index == vue_this.from_server.table_info.i_action_pos)
-                        {
+                        if (index == vue_this.from_server.table_info.i_action_pos) {
                             return;
                         }
-                        if (element.timer_id != null)
-                        {
+                        if (element.timer_id != null) {
                             clearInterval(element.timer_id);
                             element.timer_id = null;
                         }
@@ -751,7 +836,6 @@
 
             },
             follow_room: function (event) {
-                console.log(this.bind_var.input_table_no);
                 var msg = new ArrayBuffer(44);
                 var ssid_buff = new Uint8Array(msg);
                 for (let index = 0; index < this.ssid.length; index++) {
@@ -759,7 +843,6 @@
                 }
                 new DataView(msg, 32).setUint32(0, 1);
                 new DataView(msg, 36).setUint32(0, 4);
-                console.log(this.get_self_ready());
                 new DataView(msg, 40).setInt32(0, Number(this.bind_var.input_table_no));
                 this.ws_socket.send(msg);
             },
@@ -782,13 +865,13 @@
                 }
                 new DataView(msg, 32).setUint32(0, 6);
                 new DataView(msg, 36).setUint32(0, 4);
-                console.log(this.get_self_ready());
                 if (this.get_self_ready()) {
                     new DataView(msg, 40).setUint32(0, 0);
                 }
                 else {
                     new DataView(msg, 40).setUint32(0, 1);
                 }
+                this.refresh_player_cash();
                 this.ws_socket.send(msg);
             },
 
