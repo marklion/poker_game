@@ -7,7 +7,7 @@ build_front_end()
 {
     echo "building front end"
     mkdir -p "$BUILD_DIR/front-end-build"
-    cp "${PRJ_SRC_DIR}/front-end/vue-game/*" "${BUILD_DIR}/front-end-build/"
+    cp ${PRJ_SRC_DIR}/front-end/vue-game/* "${BUILD_DIR}/front-end-build/"
     [ $? != 0 ] && exit 1
 }
 
