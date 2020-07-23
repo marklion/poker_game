@@ -749,7 +749,7 @@
                             new DataView(msg, 32).setUint32(0, 5);
                             new DataView(msg, 36).setUint32(0, 6);
 
-                            this.ws_socket.send(msg);
+                            vue_this.ws_socket.send(msg);
                         }, 1000);
                     };
                     vue_this.ws_socket.onclose = function(evt) {
