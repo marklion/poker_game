@@ -362,7 +362,7 @@
             </el-footer>
         </el-container>
         <el-dialog title="秀牌" :show-close='false' :visible.sync="need_cards_result()" width="100%" v-on:opened="refresh_player_cash">
-            <el-row v-for="(single_result, index) in from_server.last_result.a_all_result" v-if="get_player_by_seat(index)">
+            <el-row style="border-style: solid;" v-for="(single_result, index) in from_server.last_result.a_all_result" v-if="get_player_by_seat(index)">
                 <el-col :span="4">
                     <p>{{index + 1}}号位 </p>
                     <p>{{get_player_by_seat(index).name}}</p>
