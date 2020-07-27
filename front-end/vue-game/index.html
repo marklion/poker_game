@@ -121,176 +121,31 @@
             <el-main v-if="from_server.table_info.i_table_no != -1" style="height: inherit;">
                 <el-row :gutter="12" style="height: 30%;">
                     <el-col :span="8">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px'}"
-                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 4) % 6 + 1)"
-                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 4) % 6)}">
-                            <div>
-                                {{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).name}}
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).cur_cash}}</i>
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).bat_cash}}</i>
-                            </div>
-                            <div class="count_down"
-                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 4) % 6].timer_id">
-                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 4) % 6].left_sec}}
-                            </div>
-                            <div v-if="!from_server.table_info.b_game_start">
-                                <el-tag type="success"
-                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 4) % 6).is_ready">已准备
-                                </el-tag>
-                                <el-tag type="danger" v-else>未准备</el-tag>
-                            </div>
-                        </el-card>
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
-                            无玩家
-                        </el-card>
+                        <other-player-view seat_pos=4 :from_server="from_server" :get_player_by_seat="get_player_by_seat"
+                        :get_seat_back_style="get_seat_back_style" :is_action_pos="is_action_pos" :timers_on_seat="timers_on_seat"></other-player-view>
                     </el-col>
                     <el-col :span="8">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px'}"
-                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 3) % 6 + 1)"
-                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 3) % 6)}">
-                            <div>
-                                {{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).name}}
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).cur_cash}}</i>
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).bat_cash}}</i>
-                            </div>
-                            <div class="count_down"
-                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 3) % 6].timer_id">
-                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 3) % 6].left_sec}}
-                            </div>
-                            <div v-if="!from_server.table_info.b_game_start">
-                                <el-tag type="success"
-                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 3) % 6).is_ready">已准备
-                                </el-tag>
-                                <el-tag type="danger" v-else>未准备</el-tag>
-                            </div>
-                        </el-card>
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
-                            无玩家
-                        </el-card>
+                        <other-player-view seat_pos=3 :from_server="from_server" :get_player_by_seat="get_player_by_seat"
+                        :get_seat_back_style="get_seat_back_style" :is_action_pos="is_action_pos" :timers_on_seat="timers_on_seat"></other-player-view>
                     </el-col>
                     <el-col :span="8">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }"
-                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 2) % 6 + 1)"
-                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 2) % 6)}">
-                            <div>
-                                {{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).name}}
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).cur_cash}}</i>
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).bat_cash}}</i>
-                            </div>
-                            <div class="count_down"
-                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 2) % 6].timer_id">
-                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 2) % 6].left_sec}}
-                            </div>
-                            <div v-if="!from_server.table_info.b_game_start">
-                                <el-tag type="success"
-                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 2) % 6).is_ready">已准备
-                                </el-tag>
-                                <el-tag type="danger" v-else>未准备</el-tag>
-                            </div>
-                        </el-card>
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
-                            无玩家
-                        </el-card>
+                        <other-player-view seat_pos=2 :from_server="from_server" :get_player_by_seat="get_player_by_seat"
+                        :get_seat_back_style="get_seat_back_style" :is_action_pos="is_action_pos" :timers_on_seat="timers_on_seat"></other-player-view>
                     </el-col>
                 </el-row>
-                <el-row :gutter="5" style="height: 60%;">
+                <el-row :gutter="5" style="height: 50%;">
                     <el-col :span="6">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }"
-                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 5) % 6 + 1)"
-                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 5) % 6)}">
-                            <div>
-                                {{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).name}}
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).cur_cash}}</i>
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).bat_cash}}</i>
-                            </div>
-                            <div class="count_down"
-                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 5) % 6].timer_id">
-                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 5) % 6].left_sec}}
-                            </div>
-                            <div v-if="!from_server.table_info.b_game_start">
-                                <el-tag type="success"
-                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 5) % 6).is_ready">已准备
-                                </el-tag>
-                                <el-tag type="danger" v-else>未准备</el-tag>
-                            </div>
-                        </el-card>
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
-                            无玩家
-                        </el-card>
+                        <other-player-view seat_pos=5 :from_server="from_server" :get_player_by_seat="get_player_by_seat"
+                        :get_seat_back_style="get_seat_back_style" :is_action_pos="is_action_pos" :timers_on_seat="timers_on_seat"></other-player-view>
                     </el-col>
                     <el-col :span="12">
-                        <el-row :gutter="5">
-                            <el-col :span="8" v-for="single_card in from_server.table_info.a_cards_on_table.slice(0,3)">
-                                <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
-                            </el-col>
-                        </el-row>
-                        <el-row :gutter="25">
-                            <el-col :span="10"
-                                v-for="single_card in from_server.table_info.a_cards_on_table.slice(3,5)">
-                                <div style="width: 100%;">
-                                    <el-image :src="get_card_pic_url(single_card.color, single_card.num)"></el-image>
-                                </div>
-                            </el-col>
-                        </el-row>
+                        <span v-for="single_card in from_server.table_info.a_cards_on_table">
+                            <el-image :src="get_card_pic_url(single_card.color, single_card.num)" style="display: inline-block; width: 20%;"></el-image>
+                        </span>
                     </el-col>
                     <el-col :span="6">
-                        <el-card class="each_player_show" :body-style="{ padding: '0px'}"
-                            v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6)"
-                            :style="get_seat_back_style((from_server.self_info.i_self_seat + 1) % 6 + 1)"
-                            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + 1) % 6)}">
-                            <div>
-                                {{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).name}}
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).cur_cash}}</i>
-                            </div>
-                            <div>
-                                <i
-                                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).bat_cash}}</i>
-                            </div>
-                            <div class="count_down"
-                                v-if="timers_on_seat[(from_server.self_info.i_self_seat + 1) % 6].timer_id">
-                                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + 1) % 6].left_sec}}
-                            </div>
-                            <div v-if="!from_server.table_info.b_game_start">
-                                <el-tag type="success"
-                                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + 1) % 6).is_ready">已准备
-                                </el-tag>
-                                <el-tag type="danger" v-else>未准备</el-tag>
-                            </div>
-                        </el-card>
-                        <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
-                            无玩家
-                        </el-card>
+                        <other-player-view seat_pos=1 :from_server="from_server" :get_player_by_seat="get_player_by_seat"
+                        :get_seat_back_style="get_seat_back_style" :is_action_pos="is_action_pos" :timers_on_seat="timers_on_seat"></other-player-view>
                     </el-col>
                 </el-row>
                 <div>
@@ -389,6 +244,42 @@
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
+    Vue.component('other-player-view', {
+        props: ['seat_pos', 'from_server', 'get_player_by_seat', 'get_seat_back_style', 'is_action_pos', 'timers_on_seat'],
+        template: `
+            <div>
+            <el-card class="each_player_show" :body-style="{ padding: '0px'}"
+            v-if="get_player_by_seat((from_server.self_info.i_self_seat + Number(seat_pos)) % 6)"
+            :style="get_seat_back_style((from_server.self_info.i_self_seat + Number(seat_pos)) % 6 + 1)"
+            :class="{blink_card:is_action_pos((from_server.self_info.i_self_seat + Number(seat_pos)) % 6)}">
+            <div>
+                {{get_player_by_seat((from_server.self_info.i_self_seat + Number(seat_pos)) % 6).name}}
+            </div>
+            <div>
+                <i
+                    class="el-icon-coin number_show">{{get_player_by_seat((from_server.self_info.i_self_seat + Number(seat_pos)) % 6).cur_cash}}</i>
+            </div>
+            <div>
+                <i
+                    class="el-icon-download number_show_bat">{{get_player_by_seat((from_server.self_info.i_self_seat + Number(seat_pos)) % 6).bat_cash}}</i>
+            </div>
+            <div class="count_down"
+                v-if="timers_on_seat[(from_server.self_info.i_self_seat + Number(seat_pos)) % 6].timer_id">
+                倒计时{{timers_on_seat[(from_server.self_info.i_self_seat + Number(seat_pos)) % 6].left_sec}}
+            </div>
+            <div v-if="!from_server.table_info.b_game_start">
+                <el-tag type="success"
+                    v-if="get_player_by_seat((from_server.self_info.i_self_seat + Number(seat_pos)) % 6).is_ready">已准备
+                </el-tag>
+                <el-tag type="danger" v-else>未准备</el-tag>
+            </div>
+            </el-card>
+            <el-card class="each_player_show" :body-style="{ padding: '0px' }" v-else>
+                无玩家
+            </el-card>
+            </div>
+        `
+    });
     new Vue({
         el: '#app',
         data: {
