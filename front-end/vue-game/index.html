@@ -258,7 +258,7 @@
             <div v-if="seat_pos != 0">
                 {{get_player_by_seat((from_server.self_info.i_self_seat + Number(seat_pos)) % 6).name}}
             </div>
-            <div>
+            <div v-else>
                 {{get_player_by_seat((from_server.self_info.i_self_seat + Number(seat_pos)) % 6).name}}(你)
             </div>
             <div>
