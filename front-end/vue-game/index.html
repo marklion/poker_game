@@ -223,7 +223,8 @@
                 v-if="get_player_by_seat(index)">
                 <el-col :span="4">
                     <p>{{index + 1}}号位 </p>
-                    <p>{{get_player_by_seat(index).name}}</p>
+                    <p v-if="from_server.self_info.i_self_seat != index">{{get_player_by_seat(index).name}}</p>
+                    <p v-else>{{get_player_by_seat(index).name}}(你)</p>
                 </el-col>
                 <el-col :span="4">
                     <p v-if="single_result.b_show">{{get_pattern_name(single_result.en_patten_type)}}</p>
