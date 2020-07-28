@@ -102,6 +102,8 @@
 
 <body>
     <div id="app">
+        <audio src="http://59.110.64.232/resource/BLG.WAV" id="action_sound"></audio>
+        <audio src="http://59.110.64.232/resource/PICKUP.WAV" id="bat_sound"></audio>
         <el-button type="primary" @click="random_login" v-if="status_var.has_not_login">游客登录</el-button>
         <el-container v-if="!status_var.has_not_login">
             <el-header>
@@ -730,6 +732,10 @@
                     if (this.timers_on_seat[this.from_server.table_info.i_action_pos].timer_id == null) {
                         this.timers_on_seat[this.from_server.table_info.i_action_pos].left_sec = 20;
                         var vue_this = this;
+                        if (this.from_server.self_info.i_self_seat == this.from_server.table_info.i_action_pos)
+                        {
+                            document.getElementById('action_sound').play();
+                        }
                         this.timers_on_seat[this.from_server.table_info.i_action_pos].timer_id = setInterval(() => {
                             vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].left_sec--;
                             if (0 >= vue_this.timers_on_seat[vue_this.from_server.table_info.i_action_pos].left_sec) {
@@ -851,6 +857,7 @@
                 new DataView(msg, 40).setUint32(0, _action);
                 new DataView(msg, 44).setUint32(0, _bat_cash);
                 this.ws_socket.send(msg);
+                document.getElementById('bat_sound').play();
             }
 
         }
