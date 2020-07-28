@@ -90,6 +90,13 @@
             color: crimson;
             background-color: darksalmon;
         }
+        .result_show {
+            border-style: solid;
+            background-color: lightgoldenrodyellow;
+        }
+        .self_result_show {
+            background-color: lightblue;
+        }
     </style>
 </head>
 
@@ -219,8 +226,8 @@
         </el-container>
         <el-dialog title="秀牌" :show-close='false' :visible.sync="need_cards_result()" width="100%"
             v-on:opened="refresh_player_cash">
-            <el-row style="border-style: solid;" v-for="(single_result, index) in from_server.last_result.a_all_result"
-                v-if="get_player_by_seat(index)">
+            <el-row class="result_show" v-for="(single_result, index) in from_server.last_result.a_all_result"
+                v-if="get_player_by_seat(index)" :class="{self_result_show: index == from_server.self_info.i_self_seat}">
                 <el-col :span="4">
                     <p>{{index + 1}}号位 </p>
                     <p v-if="from_server.self_info.i_self_seat != index">{{get_player_by_seat(index).name}}</p>
@@ -447,10 +454,10 @@
             },
             get_cash_change: function (_seat) {
                 if (this.get_player_by_seat(_seat).cur_cash > this.status_var.cash_before_show[_seat]) {
-                    return "赢" + (this.get_player_by_seat(_seat).cur_cash - this.status_var.cash_before_show[_seat]);
+                    return "+" + (this.get_player_by_seat(_seat).cur_cash - this.status_var.cash_before_show[_seat]);
                 }
                 else if (this.get_player_by_seat(_seat).cur_cash < this.status_var.cash_before_show[_seat]) {
-                    return "输" + (this.status_var.cash_before_show[_seat] - this.get_player_by_seat(_seat).cur_cash);
+                    return "-" + (this.status_var.cash_before_show[_seat] - this.get_player_by_seat(_seat).cur_cash);
                 }
                 else {
                     return "无变化";
