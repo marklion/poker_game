@@ -3,18 +3,20 @@
 
 #include "user_manage.h"
 #include "random_user.h"
+#include "db_sqlite_user.h"
 
-register_resp user_manage::proc_register(const register_req& text)
+register_resp user_manage::proc_register(const register_req &text)
 {
     register_resp ret;
 
-    ret.type = "response";
-    ret.action = text.action;
-    ret.status = "success";
+    auto db_ret = db_sqlite_insert_user(text.reg_number, text.reg_password, text.reg_name);
+    if (true == db_ret)
+        ret = "success";
+    else
+        ret = "fail";
 
     return ret;
 }
-
 
 hello_resp user_manage::proc_get_hello()
 {
@@ -22,7 +24,6 @@ hello_resp user_manage::proc_get_hello()
 
     return ret;
 }
-
 
 login_random_resp user_manage::proc_login_random()
 {
@@ -36,7 +37,6 @@ login_random_resp user_manage::proc_login_random()
         ret.type = "response";
         ret.ssid = random_user_ssid;
     }
-
 
     return ret;
 }
