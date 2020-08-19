@@ -48,7 +48,7 @@ export default {
             var vue_this = this;
             this.axios.post('/user_manage/register', {
                 text:{
-                    reg_number: window.btoa(encodeURIComponent(this.reg_username_input)),
+                    reg_number: this.reg_username_input,
                     reg_password: window.btoa(encodeURIComponent(this.reg_password_input)),
                     reg_name: window.btoa(encodeURIComponent(this.reg_player_name_input))}
                 }
@@ -61,6 +61,13 @@ export default {
                             type: 'success'
                         });
                         vue_this.$router.push({name: 'pk_login'});
+                        break;
+                    case 'exit':
+                        vue_this.$notify({
+                            title: '失败',
+                            message: '用户已存在',
+                            type: 'error'
+                        });
                         break;
                     default:
                         vue_this.$notify({
