@@ -10,8 +10,10 @@ register_resp user_manage::proc_register(const register_req &text)
     register_resp ret;
 
     auto db_ret = db_sqlite_insert_user(text.reg_number, text.reg_password, text.reg_name);
-    if (true == db_ret)
+    if (0 == db_ret)
         ret = "success";
+    else if (1 == db_ret)
+        ret = "exit";
     else
         ret = "fail";
 
