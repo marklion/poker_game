@@ -48,9 +48,9 @@ export default {
             var vue_this = this;
             this.axios.post('/user_manage/register', {
                 text:{
-                    reg_number: this.reg_username_input,
-                    reg_password: this.reg_password_input,
-                    reg_name: this.reg_player_name_input}
+                    reg_number: window.btoa(encodeURIComponent(this.reg_username_input)),
+                    reg_password: window.btoa(encodeURIComponent(this.reg_password_input)),
+                    reg_name: window.btoa(encodeURIComponent(this.reg_player_name_input))}
                 }
             ).then(function(response) {
                 switch (response.data.result) {
