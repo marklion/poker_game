@@ -29,4 +29,4 @@ set_target_properties(user_manage PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SERVICES_DIR}"
 )
 
-target_link_libraries(user_manage ngrestutils ngrestcommon ngrestjson ngrestengine $ENV{NGREST_EXT_LIBS} uuid hiredis)
+target_link_libraries(user_manage ngrestutils ngrestcommon ngrestjson ngrestengine $ENV{NGREST_EXT_LIBS} uuid hiredis sqlite3)

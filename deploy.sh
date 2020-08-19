@@ -5,6 +5,7 @@ echo "deploying"
 PRJ_SRC_DIR=$(dirname `realpath $0`)
 PRJ_DEPLOY_DIR=$PRJ_SRC_DIR/../deploy
 BUILD_DIR=$PRJ_SRC_DIR/../build
+PRJ_DATABASE_DIR=$PRJ_SRC_DIR/../database
 
 rm -rf $PRJ_DEPLOY_DIR
 mkdir -p $PRJ_DEPLOY_DIR
@@ -36,7 +37,7 @@ user_mng_deploy()
 start_server()
 {
     docker rm -f `docker ps -a | grep poker_deploy | awk '{print $1}'`
-    docker run -p 80:80 -d -v "$PRJ_DEPLOY_DIR":/web  marklion/poker_deploy:v1.0 /root/run-server.sh
+    docker run -p 80:80 -d -v "$PRJ_DEPLOY_DIR":/web  -v "$PRJ_DATABASE_DIR":/database marklion/poker_deploy:v1.0 /root/run-server.sh
 }
 main()
 {
@@ -44,6 +45,10 @@ main()
     then
         tar xf "$1" -C $PRJ_DEPLOY_DIR
         cp $PRJ_DEPLOY_DIR/package*/* $PRJ_DEPLOY_DIR/ -a
+        if [ -d "$2" ]
+        then
+            PRJ_DATABASE_DIR="$2"
+        fi
     else
         front_end_deploy
         resouce_deploy

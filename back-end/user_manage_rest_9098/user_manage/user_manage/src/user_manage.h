@@ -9,17 +9,11 @@
 
 struct register_req
 {
-    std::string type;
-    std::string action;
-    std::string username;
-    std::string password;
+    std::string reg_number;
+    std::string reg_password;
+    std::string reg_name;
 };
-struct register_resp
-{
-    std::string type;
-    std::string action;
-    std::string status;
-};
+typedef std::string register_resp;
 
 struct hello_resp
 {

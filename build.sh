@@ -28,8 +28,8 @@ build_back_end()
 prepare_docker()
 {
     echo "prepare docker"
-    docker pull marklion/back-end-build:v1.0
-    docker pull marklion/poker_deploy:v1.0
+    docker images | grep 'marklion/back-end-build' | grep 'v1.0' || docker pull marklion/back-end-build:v1.0
+    docker images | grep 'marklion/poker_deploy' | grep 'v1.0' || docker pull marklion/poker_deploy:v1.0
 }
 make_package()
 {
