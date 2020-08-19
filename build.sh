@@ -7,8 +7,11 @@ build_front_end()
 {
     echo "building front end"
     mkdir -p "$BUILD_DIR/front-end-build"
-    cp ${PRJ_SRC_DIR}/front-end/vue-game/* "${BUILD_DIR}/front-end-build/"
+    # cp ${PRJ_SRC_DIR}/front-end/vue-game/* "${BUILD_DIR}/front-end-build/"
+    docker run --rm -v "${PRJ_SRC_DIR}/front-end/pk_prj":/pk_prj_build -w /pk_prj_build marklion/back-end-build:v1.0 'npm install && npm run build'
     [ $? != 0 ] && exit 1
+    mv "${PRJ_SRC_DIR}/front-end/pk_prj/dist/*" "$BUILD_DIR/front-end-build/"
+    rm "${PRJ_SRC_DIR}/front-end/pk_prj/dist/" -rf
 }
 
 build_back_end()
@@ -34,7 +37,7 @@ make_package()
     local package_path="$BUILD_DIR/package-$timestamp"
     mkdir -p $package_path
 
-    cp ${BUILD_DIR}/front-end-build/index.html   ${package_path}/index.html
+    cp ${BUILD_DIR}/front-end-build/* -a  ${package_path}/
     mkdir -p $package_path/resource
     cp ${PRJ_SRC_DIR}/back-end/resouce_http/* -a ${package_path}/resource
     mkdir -p $package_path/game_server

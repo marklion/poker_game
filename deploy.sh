@@ -12,7 +12,7 @@ mkdir -p $PRJ_DEPLOY_DIR
 front_end_deploy()
 {
     echo "front"
-    cp ${BUILD_DIR}/front-end-build/index.html   ${PRJ_DEPLOY_DIR}/index.html
+    cp ${BUILD_DIR}/front-end-build/* -a ${PRJ_DEPLOY_DIR}/
 }
 resouce_deploy()
 {
