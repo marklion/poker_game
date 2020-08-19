@@ -20,6 +20,23 @@ register_resp user_manage::proc_register(const register_req &text)
     return ret;
 }
 
+login_resp user_manage::proc_login(const login_req& text)
+{
+    login_resp ret = {"fail", ""};
+
+    if (db_sqlite_query_user(text.login_id, text.login_pwd))
+    {
+        auto ssid = db_sqlite_logon_user(text.login_id);
+        if (ssid.length() == 32)
+        {
+            ret.status = "success";
+            ret.ssid = ssid;
+        }
+    }
+
+    return ret;
+}
+
 hello_resp user_manage::proc_get_hello()
 {
     hello_resp ret = {"hello mvc"};

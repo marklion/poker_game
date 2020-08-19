@@ -1,5 +1,6 @@
 #include "db_sqlite_user.h"
 #include <sqlite3.h>
+#include <string.h>
 
 static bool id_is_valid(std::string _id)
 {
@@ -85,4 +86,53 @@ int db_sqlite_insert_user(std::string _id, std::string _pwd, std::string _userna
     }
 
     return bRet;
+}
+
+struct db_query_user{
+    const char *pwd;
+    int number;
+};
+static int verify_user_password(void *_pQA, int agrc, char ** argv, char **col)
+{
+    int ret = -1;
+    db_query_user *pQueryArg = (db_query_user *)_pQA;
+
+    if (0 == strcmp(pQueryArg->pwd, argv[0]))
+    {
+        pQueryArg->number = 1;
+        ret = 0;
+    }
+
+    return ret;
+}
+
+bool db_sqlite_query_user(std::string _id, std::string _pwd)
+{
+    bool bRet = false;
+    sqlite3 *db = NULL;
+
+    auto dbret = sqlite3_open("/database/pk_user", &db);
+    if (SQLITE_OK == dbret)
+    {
+        std::string sql_cmd = "select pwd from pk_user where id = '" + _id + "';";
+        db_query_user query_arg = {_pwd.c_str(), 0};
+        dbret = sqlite3_exec(db, sql_cmd.c_str(), verify_user_password, (void *)&query_arg, NULL);
+        if (SQLITE_OK == dbret)
+        {
+            if (query_arg.number == 1)
+            {
+                bRet = true;
+            }
+        }
+
+        sqlite3_close(db);
+    }
+
+
+    return bRet;
+}
+
+std::string db_sqlite_logon_user(std::string _id)
+{
+    return "246a105e50fc4e6883ebb4b8c558d16a";
 }

@@ -27,6 +27,19 @@ struct login_random_resp
     std::string ssid;
 };
 
+struct login_req
+{
+    std::string login_id;
+    std::string login_pwd;
+};
+
+struct login_resp
+{
+    std::string status;
+    std::string ssid;
+};
+
+
 //! Dummy description for the service
 /*! Some detailed description of the service */
 // '*location' comment sets resource path for this service
@@ -42,6 +55,10 @@ public:
     // *method: POST
     // *location: /register
     register_resp proc_register(const register_req& text);
+
+    // *method: POST
+    // *location: /login
+    login_resp proc_login(const login_req& text);
 
     // *method: GET
     // *location: /login_random
