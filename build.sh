@@ -10,7 +10,7 @@ build_front_end()
     # cp ${PRJ_SRC_DIR}/front-end/vue-game/* "${BUILD_DIR}/front-end-build/"
     docker run --rm -v "${PRJ_SRC_DIR}/front-end/pk_prj":/pk_prj_build -w /pk_prj_build marklion/back-end-build:v1.0 bash -c 'npm install && npm run build'
     [ $? != 0 ] && exit 1
-    mv "${PRJ_SRC_DIR}/front-end/pk_prj/dist/*" "$BUILD_DIR/front-end-build/"
+    mv ${PRJ_SRC_DIR}/front-end/pk_prj/dist/* "$BUILD_DIR/front-end-build/"
     rm "${PRJ_SRC_DIR}/front-end/pk_prj/dist/" -rf
 }
 
