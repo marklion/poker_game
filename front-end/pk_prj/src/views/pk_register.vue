@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import {Base64} from 'js-base64'
 export default {
     name: 'pk_register',
     data: function() {
@@ -46,11 +47,12 @@ export default {
         },
         submit_reg_btn: function () {
             var vue_this = this;
+            Base64.extendString();
             this.axios.post('/user_manage/register', {
                 text:{
                     reg_number: this.reg_username_input,
-                    reg_password: window.btoa(encodeURIComponent(this.reg_password_input)),
-                    reg_name: window.btoa(encodeURIComponent(this.reg_player_name_input))}
+                    reg_password: this.reg_password_input,
+                    reg_name: this.reg_player_name_input.toBase64()}
                 }
             ).then(function(response) {
                 switch (response.data.result) {

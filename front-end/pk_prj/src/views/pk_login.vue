@@ -35,7 +35,7 @@ export default {
             this.axios.post('/user_manage/login', {
                 text:{
                     login_id: this.user_name_input,
-                    login_pwd: window.btoa(encodeURIComponent(this.user_pwd_input))
+                    login_pwd: this.user_pwd_input
                 }
             }).then(function(resp) {
                 console.log(resp.data.result);
