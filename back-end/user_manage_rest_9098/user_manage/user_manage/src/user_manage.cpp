@@ -5,15 +5,19 @@
 #include "random_user.h"
 #include "db_sqlite_user.h"
 #include "Base64.h"
+#include "picosha2.h"
 
 register_resp user_manage::proc_register(const register_req &text)
 {
     register_resp ret;
     std::string reg_name;
+    std::string hash_pwd;
+
+    picosha2::hash256_hex_string(text.reg_password, hash_pwd);
 
     if (true == Base64::Decode(text.reg_name, &reg_name))
     {
-        auto db_ret = db_sqlite_insert_user(text.reg_number, text.reg_password, reg_name);
+        auto db_ret = db_sqlite_insert_user(text.reg_number, hash_pwd, reg_name);
         if (0 == db_ret)
             ret = "success";
         else if (1 == db_ret)
@@ -28,8 +32,11 @@ register_resp user_manage::proc_register(const register_req &text)
 login_resp user_manage::proc_login(const login_req& text)
 {
     login_resp ret = {"fail", ""};
+    std::string hash_pwd;
 
-    if (db_sqlite_query_user(text.login_id, text.login_pwd))
+    picosha2::hash256_hex_string(text.login_pwd, hash_pwd);
+
+    if (db_sqlite_query_user(text.login_id, hash_pwd))
     {
         auto ssid = db_sqlite_logon_user(text.login_id);
         if (ssid.length() == 32)
