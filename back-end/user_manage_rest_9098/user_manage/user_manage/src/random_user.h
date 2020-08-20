@@ -4,6 +4,7 @@
 
 std::string RandomUserGenerat();
 
+std::string GetRanSsid();
 
 #endif // _RANDOM_USER_H_
 

@@ -4,18 +4,23 @@
 #include "user_manage.h"
 #include "random_user.h"
 #include "db_sqlite_user.h"
+#include "Base64.h"
 
 register_resp user_manage::proc_register(const register_req &text)
 {
     register_resp ret;
+    std::string reg_name;
 
-    auto db_ret = db_sqlite_insert_user(text.reg_number, text.reg_password, text.reg_name);
-    if (0 == db_ret)
-        ret = "success";
-    else if (1 == db_ret)
-        ret = "exit";
-    else
-        ret = "fail";
+    if (true == Base64::Decode(text.reg_name, &reg_name))
+    {
+        auto db_ret = db_sqlite_insert_user(text.reg_number, text.reg_password, reg_name);
+        if (0 == db_ret)
+            ret = "success";
+        else if (1 == db_ret)
+            ret = "exit";
+        else
+            ret = "fail";
+    }
 
     return ret;
 }

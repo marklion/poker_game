@@ -8,6 +8,7 @@ if (HAS_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 if (NOT APPLE)
     check_cxx_compiler_flag(-Wl,--no-undefined HAS_NO_UNDEFINED)
     if (HAS_NO_UNDEFINED)

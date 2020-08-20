@@ -1,6 +1,9 @@
 #include "db_sqlite_user.h"
+#include "random_user.h"
 #include <sqlite3.h>
 #include <string.h>
+#include <hiredis/hiredis.h>
+#include "Base64.h"
 
 static bool id_is_valid(std::string _id)
 {
@@ -132,7 +135,123 @@ bool db_sqlite_query_user(std::string _id, std::string _pwd)
     return bRet;
 }
 
+std::string get_ssid_by_id(std::string _id)
+{
+    std::string ret = "";
+
+    redisContext *predis = redisConnect("localhost", 6379);
+    if (NULL != predis)
+    {
+        auto preply = redisCommand(predis, "HGET id:%s ssid", _id.c_str());
+        if (NULL != preply)
+        {
+            auto pStdReply = (redisReply *)preply;
+            if (pStdReply->type == REDIS_REPLY_STRING)
+            {
+                if (pStdReply->len == 32)
+                {
+                    ret.assign(pStdReply->str, pStdReply->len);
+                }
+            }
+            freeReplyObject(preply);
+        }
+
+        redisFree(predis);
+    }
+
+    return ret;
+}
+
+bool store_ssid_id(std::string _id, std::string _ssid, std::string _name, int _cash)
+{
+    bool bRet = false;
+
+    redisContext *predis = redisConnect("localhost", 6379);
+    if (NULL != predis)
+    {
+        auto preply = redisCommand(predis, "HMSET user_ssid:%s name %s cash %d id %s", _ssid.c_str(), _name.c_str(), _cash, _id.c_str());
+        if (NULL != preply)
+        {
+            freeReplyObject(preply);
+            preply = redisCommand(predis, "HMSET id:%s ssid %s", _id.c_str(), _ssid.c_str());
+            if (NULL != preply)
+            {
+                freeReplyObject(preply);
+                bRet = true;
+            }
+            else
+            {
+                preply = redisCommand(predis, "DEL user_ssid:%s", _ssid.c_str());
+                if (NULL != preply)
+                {
+                    freeReplyObject(preply);
+                }
+            }
+
+        }
+        redisFree(predis);
+    }
+
+
+    return bRet;
+}
+
+int logon_callback(void *_pri_data, int argc, char **argv, char **columns)
+{
+    std::string *pArg = (std::string *)_pri_data;
+    int bRet = -1;
+    std::string id = "";
+    std::string name = "";
+    int cash = 0;
+
+    for (int i = 0; i < argc; i++)
+    {
+        if (0 == strcasecmp("id", columns[i]))
+        {
+            id = argv[i];
+        }
+        if (0 == strcasecmp("name", columns[i]))
+        {
+            name = argv[i];
+        }
+        if (0 == strcasecmp("cash", columns[i]))
+        {
+            cash = atoi(argv[i]);
+        }
+    }
+
+    *pArg = get_ssid_by_id(id);
+    if (pArg->length() == 32)
+    {
+        bRet = 0;
+    }
+    else
+    {
+        auto ssid = GetRanSsid();
+        if (true == store_ssid_id(id, ssid, name, cash))
+        {
+            *pArg = ssid;
+            bRet = 0;
+        }
+    }
+
+    return bRet;
+}
+
 std::string db_sqlite_logon_user(std::string _id)
 {
-    return "246a105e50fc4e6883ebb4b8c558d16a";
+    sqlite3 *db;
+    std::string ssid_ret = "";
+
+    auto db_ret = sqlite3_open("/database/pk_user", &db);
+    if (SQLITE_OK == db_ret)
+    {
+        std::string sql_cmd = "select * from pk_user where id = '" + _id + "';";
+
+        sqlite3_exec(db, sql_cmd.c_str(), logon_callback, &ssid_ret, NULL);
+
+        sqlite3_close(db);
+    }
+
+    return ssid_ret;
 }
