@@ -31,7 +31,7 @@ export default {
             this.$router.push({name: 'pk_register'});
         },
         login_btn: function() {
-            // var vue_this = this;
+            var vue_this = this;
             this.axios.post('/user_manage/login', {
                 text:{
                     login_id: this.user_name_input,
@@ -39,8 +39,31 @@ export default {
                 }
             }).then(function(resp) {
                 console.log(resp.data.result);
+                if (resp.data.result.status == 'success')
+                {
+                    vue_this.$cookies.set('ssid', resp.data.result.ssid);
+                    vue_this.$notify({
+                        title: '成功',
+                        message: '登录成功',
+                        type: 'success'
+                    });
+                    vue_this.$router.push({path:'/'});
+                    }
+                else
+                {
+                    vue_this.$notify({
+                        title: '失败',
+                        message: '用户名或密码错误',
+                        type: 'error'
+                    });
+                }
             }).catch(function(error) {
                 console.log(error);
+                vue_this.$notify({
+                    title: '失败',
+                    message: '用户名或密码错误',
+                    type: 'error'
+                });
             });
         }
     }

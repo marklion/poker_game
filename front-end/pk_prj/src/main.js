@@ -3,8 +3,10 @@ import './plugins/axios'
 import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
+import cookies from 'vue-cookies'
 
-Vue.config.productionTip = false
+Vue.prototype.$cookies = cookies;
+Vue.config.productionTip = false;
 
 new Vue({
   router,
