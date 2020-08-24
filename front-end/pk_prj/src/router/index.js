@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import pk_login from '../views/pk_login.vue'
 import pk_register from '../views/pk_register.vue'
 import pk_hall from '../views/pk_hall.vue'
+import pk_room from '../views/pk_room.vue'
 
 Vue.use(VueRouter)
 
@@ -21,6 +22,11 @@ Vue.use(VueRouter)
     path: '/pk_register',
     name: 'pk_register',
     component: pk_register
+  },
+  {
+    path: '/pk_room/:room_no',
+    name: 'pk_room',
+    component: pk_room
   },
 ]
 

@@ -11,6 +11,23 @@
                 <el-col :span="12">{{player_cash_show}}</el-col>
             </el-row>
         </el-card>
+        <hr>
+        <el-row :gutter="20">
+            <el-col :span="12">
+                <el-button type="success" round>随机入座</el-button>
+            </el-col>
+            <el-col :span="12">
+                <el-button type="primary" round>创建房间</el-button>
+            </el-col>
+        </el-row>
+        <el-row :gutter="10">
+            <el-col :span="18">
+                <el-input v-model="room_no_input" placeholder="请输入房间号"></el-input>
+            </el-col>
+            <el-col :span="6">
+                <el-button type="primary" plain @click="enter_room(room_no_input)">进入房间</el-button>
+            </el-col>
+        </el-row>
     </div>
     <div v-else>
         <el-button @click="nav_login">请先登录</el-button>
@@ -27,6 +44,7 @@ export default {
             is_login:false,
             player_name_show: '',
             player_cash_show: '',
+            room_no_input: '',
         };
     },
     methods: {
@@ -37,6 +55,9 @@ export default {
             this.axios.get('/user_manage/logoff/' + this.$cookies.get('ssid'));
             this.$cookies.remove('ssid');
             location.reload(true);
+        },
+        enter_room:function(room_no) {
+            this.$router.push({path: '/pk_room/' + room_no});
         },
     },
     beforeMount: function() {
@@ -68,4 +89,16 @@ export default {
     .clearfix:after {
         clear: both
     }
+    .el-row {
+    margin-bottom: 20px;
+    &:last-child {
+        margin-bottom: 0;
+    }
+    .el-button {
+        display: block;
+        width: 100%;
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+}
 </style>

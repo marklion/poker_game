@@ -46,6 +46,25 @@ export default {
             this.$router.push({name: 'pk_login'});
         },
         submit_reg_btn: function () {
+            if (this.reg_username_input == '' ||
+                this.reg_password == '' ||
+                this.reg_confirm_password_input == '' ||
+                this.reg_player_name_input == '')
+            {
+                this.$message('所有信息都需要输入');
+                return;
+            }
+            var pattern = /^1[34578]\d{9}$/;
+            if (!pattern.test(this.reg_username_input))
+            {
+                this.$message('手机号格式错误');
+                return;
+            }
+            if (this.reg_password_input != this.reg_confirm_password_input)
+            {
+                this.$message('密码不一致');
+                return;
+            }
             var vue_this = this;
             Base64.extendString();
             this.axios.post('/user_manage/register', {
