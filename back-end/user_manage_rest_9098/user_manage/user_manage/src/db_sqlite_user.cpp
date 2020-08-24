@@ -68,7 +68,7 @@ int db_sqlite_insert_user(std::string _id, std::string _pwd, std::string _userna
         if (0 == db_ret)
         {
             char *errmsg = NULL;
-            std::string sql_cmd = "insert into pk_user values ('" + _id + "', '" + _pwd + "', '" + _username + "');";
+            std::string sql_cmd = "insert into pk_user values ('" + _id + "', '" + _pwd + "', '" + _username + "', 0);";
             db_ret = sqlite3_exec(db, sql_cmd.c_str(), NULL, NULL, &errmsg);
             if (SQLITE_OK == db_ret)
             {

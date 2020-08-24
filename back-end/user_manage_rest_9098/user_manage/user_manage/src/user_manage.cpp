@@ -6,6 +6,7 @@
 #include "db_sqlite_user.h"
 #include "Base64.h"
 #include "picosha2.h"
+#include <hiredis/hiredis.h>
 
 register_resp user_manage::proc_register(const register_req &text)
 {
@@ -67,6 +68,61 @@ login_random_resp user_manage::proc_login_random()
         ret.status = "success";
         ret.type = "response";
         ret.ssid = random_user_ssid;
+    }
+
+    return ret;
+}
+
+std::string get_string_from_redis(redisContext *_predis, std::string _command)
+{
+    std::string ret = "";
+
+    auto preply = redisCommand(_predis, _command.c_str());
+    if (NULL != preply)
+    {
+        redisReply *stdreply = (redisReply *)preply;
+        if (REDIS_REPLY_STRING == stdreply->type)
+        {
+            ret.assign(stdreply->str, stdreply->len);
+        }
+
+        freeReplyObject(preply);
+    }
+
+    return ret;
+}
+
+get_user_info_resp user_manage::proc_get_user_info(std::string ssid)
+{
+    get_user_info_resp ret = {"fail", "", ""};
+    redisContext *predis = redisConnect("localhost", 6379);
+
+    if (NULL != predis)
+    {
+        std::string command;
+        command = std::string("HGET user_ssid:") + ssid + " name";
+        Base64::Encode(get_string_from_redis(predis, command), &ret.name) ;
+        command = std::string("HGET user_ssid:") + ssid + " cash";
+        ret.cash = get_string_from_redis(predis, command);
+        ret.status = "success";
+
+        redisFree(predis);
+    }
+
+    return ret;
+}
+
+std::string user_manage::proc_logoff(std::string ssid)
+{
+    std::string ret = "fail";
+    redisContext *predis = redisConnect("localhost", 6379);
+    if (NULL != predis)
+    {
+        auto user_id = get_string_from_redis(predis, std::string("HGET user_ssid:") + ssid + " id");
+        freeReplyObject(redisCommand(predis, "DEL user_ssid:%s", ssid.c_str()));
+        freeReplyObject(redisCommand(predis, "DEL id:%s", user_id.c_str()));
+        redisFree(predis);
+        ret = "success";
     }
 
     return ret;

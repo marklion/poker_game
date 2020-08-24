@@ -39,6 +39,12 @@ struct login_resp
     std::string ssid;
 };
 
+struct get_user_info_resp{
+    std::string status;
+    std::string name;
+    std::string cash;
+};
+
 
 //! Dummy description for the service
 /*! Some detailed description of the service */
@@ -61,8 +67,16 @@ public:
     login_resp proc_login(const login_req& text);
 
     // *method: GET
+    // *location: /logoff/{ssid}
+    std::string proc_logoff(std::string ssid);
+
+    // *method: GET
     // *location: /login_random
     login_random_resp proc_login_random();
+
+    // *method: GET
+    // *location: /user_info/{ssid}
+    get_user_info_resp proc_get_user_info(std::string ssid);
 };
 
 

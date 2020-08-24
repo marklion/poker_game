@@ -1,9 +1,16 @@
 <template>
 <div>
-    <p>{{is_login}}</p>
     <div v-if="is_login">
-        <p>昵称：{{player_name_show}}</p>
-        <p>余额：{{player_cash_show}}</p>
+        <el-card>
+            <div slot="header" class="clearfix">
+                <span>{{player_name_show}}</span>
+                <el-button style="float: right; padding: 3px 0" type="text" @click="logout_btn">退出登录</el-button>
+            </div>
+            <el-row :gutter="10">
+                <el-col :span="12">金额</el-col>
+                <el-col :span="12">{{player_cash_show}}</el-col>
+            </el-row>
+        </el-card>
     </div>
     <div v-else>
         <el-button @click="nav_login">请先登录</el-button>
@@ -12,6 +19,7 @@
 </template>
 
 <script>
+import {Base64} from 'js-base64'
 export default {
     name: 'pk_hall',
     data: function() {
@@ -24,17 +32,23 @@ export default {
     methods: {
         nav_login: function() {
             this.$router.push({name: 'pk_login'});
-        }
+        },
+        logout_btn: function() {
+            this.axios.get('/user_manage/logoff/' + this.$cookies.get('ssid'));
+            this.$cookies.remove('ssid');
+            location.reload(true);
+        },
     },
     beforeMount: function() {
+        Base64.extendString();
         var ssid = this.$cookies.get('ssid');
         var vue_this = this;
-        this.axios.get("/user_manage/user_info?ssid=" + ssid)
+        this.axios.get("/user_manage/user_info/" + ssid)
         .then(function(resp) {
             console.log(resp.data.result);
             if (resp.data.result.status == "success")
             {
-                vue_this.player_name_show = resp.data.result.name;
+                vue_this.player_name_show = resp.data.result.name.fromBase64();
                 vue_this.player_cash_show = resp.data.result.cash;
                 vue_this.is_login = true;
             }
@@ -46,5 +60,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+    .clearfix:before,
+    .clearfix:after {
+        display: table;
+        content: "";
+    }
+    .clearfix:after {
+        clear: both
+    }
 </style>
