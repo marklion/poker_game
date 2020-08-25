@@ -1,0 +1,28 @@
+syntax = "proto3";
+package pk_game;
+
+message sync_info {
+    string ssid = 1;
+}
+
+message enter_room {
+    string ssid = 1;
+    int32 room_no = 2;
+}
+
+message player_info {
+    string ssid = 1;
+    int32 seat = 2;
+    string name = 3;
+    int32 bat_cash = 4;
+    int32 cur_cash = 5;
+}
+
+message room_info {
+    int32 room_no = 1;
+    repeated player_info all_players = 2;
+    int32 round = 3;
+    int32 action_seat = 4;
+    int32 big_blind = 5;
+    int32 min_bat = 6;
+}
