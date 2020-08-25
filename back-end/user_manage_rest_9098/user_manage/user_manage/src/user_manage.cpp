@@ -104,7 +104,10 @@ get_user_info_resp user_manage::proc_get_user_info(std::string ssid)
         Base64::Encode(get_string_from_redis(predis, command), &ret.name) ;
         command = std::string("HGET user_ssid:") + ssid + " cash";
         ret.cash = get_string_from_redis(predis, command);
-        ret.status = "success";
+        if (ret.name.length() > 0 && ret.cash.length() > 0)
+        {
+            ret.status = "success";
+        }
 
         redisFree(predis);
     }
