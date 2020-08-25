@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import messages from "../plugins/test_pb"
 export default {
     name: 'pk_room',
     data: function() {
@@ -14,6 +15,9 @@ export default {
     },
     beforeMount: function() {
         this.room_no = this.$route.params.room_no;
+        this.pk_ws = new WebSocket("ws://59.110.64.232/game", "binary");
+        var msg = new messages.Test();
+        msg.setTestId(12);
     }
 }
 </script>
