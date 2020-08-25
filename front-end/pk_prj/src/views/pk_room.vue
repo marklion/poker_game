@@ -23,6 +23,7 @@ export default {
         var vue_this = this;
         this.pk_ws.onopen = function(evt) {
             vue_this.pk_ws.send(msg.serializeBinary());
+            console.log(evt);
         };
     }
 }
