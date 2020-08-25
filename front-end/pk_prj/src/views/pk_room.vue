@@ -18,6 +18,9 @@ export default {
         this.pk_ws = new WebSocket("ws://59.110.64.232/game", "binary");
         var msg = new messages.Test();
         msg.setTestId(12);
+        console.log(msg);
+        var bytes = msg.serializeBinary();
+        console.log(bytes);
     }
 }
 </script>
