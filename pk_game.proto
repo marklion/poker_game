@@ -5,6 +5,11 @@ message sync_info {
     string ssid = 1;
 }
 
+message create_room {
+    string ssid = 1;
+    int32 room_no = 2;
+}
+
 message enter_room {
     string ssid = 1;
     int32 room_no = 2;

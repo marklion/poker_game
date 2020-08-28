@@ -3,6 +3,7 @@
 #include "game_msg_processor.h"
 #include "../../front-end/poker_game/msg-encode-utils/msg_encode_utils.h"
 #include "timer_channel.h"
+#include "game_tcp_channel.h"
 
 class game_session_channel:public ZinxTcpData, public timeout_task{
     char m_ssid[GAME_MSG_SSID_LEN] = {0};
@@ -41,7 +42,7 @@ class game_ss_fac:public IZinxTcpConnFact {
 
 int main(int argc, const char** argv) {
     ZinxKernel::ZinxKernelInit();
-    auto plistChannel = new ZinxTCPListen(50050, new game_ss_fac());
+    auto plistChannel = new ZinxTCPListen(50050, new game_tcp_fact());
     ZinxKernel::Zinx_Add_Channel(*plistChannel);
     ZinxKernel::Zinx_Add_Channel(*(new timer_channel()));
     ZinxKernel::Zinx_Run();
